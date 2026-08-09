@@ -1191,6 +1191,7 @@ section {
   object-position: center 20%;
 }
 
+.team-photo img[alt="Jesus Castellanos"] { object-position: center 40% !important; }
 .team-photo img[alt="Joe Lakamp"] { object-position: center 35% !important; }
 .team-photo img[alt="Alina Akopians"] { object-position: center 35% !important; }
 .team-photo img[alt="Nick Donald"] { object-position: center 35% !important; }
