@@ -267,7 +267,7 @@ PROJ = [('Berryman I', 'Mar Vista', '156 leasable units', 'Delivered 2025', 'ber
         ('Reading', 'Westchester', '124 leasable units', 'Delivered 2025', 'reading', 'Reading, a five-story blue and white building'),
         ('Wilton', 'Los Angeles', '132 leasable units', 'Delivered 2026', 'wilton', 'Wilton, seen from the street corner'),
         ('Venice', 'Mar Vista', '112 leasable units', 'Delivered 2023', 'venice', 'Venice, a four-story white and black building')]
-TRACK = [('15', 'buildings completed since 2016'), ('10', 'under construction, 927 units'),
+TRACK = [('8', 'buildings completed since 2020'), ('10', 'under construction, 927 units'),
          ('About $150M', 'bonding capacity for affordable and tax credit work')]
 
 def pcard(t, m, p, ratio='4 / 3', big=False):
@@ -332,7 +332,7 @@ def tom(t, m, bg=None):
           f'justify-content: center; text-align: center; font-size: 12px; line-height: 1.3; color: {t["muted"]}; padding: 8px; box-sizing: border-box">[Photo: Tom Taggart]</div>')
     who = (f'<div><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,24,21)}px; color: {t["text"]}">Tom Taggart</div>'
            f'<div style="font-size: 16px; color: {t["muted"]}">Head of Business Development</div>'
-           f'<div style="margin-top: 8px; font-size: 16px; color: {t["text"]}">[direct line] | <a href="mailto:tpt@sixpeakcapital.com" style="color: {t["text"]}; text-decoration: underline; text-underline-offset: 3px">tpt@sixpeakcapital.com</a></div></div>')
+           f'<div style="margin-top: 8px; font-size: 16px; color: {t["text"]}"><a href="tel:+17242720182" style="color: {t["text"]}; text-decoration: underline; text-underline-offset: 3px">(724) 272-0182</a> | <a href="mailto:tpt@sixpeakcapital.com" style="color: {t["text"]}; text-decoration: underline; text-underline-offset: 3px">tpt@sixpeakcapital.com</a></div></div>')
     btns = f'<div style="display: flex; flex-wrap: wrap; gap: 14px">{btn(t, m, "Book a call", full=m)}{btn(t, m, "Send a plan set", primary=False, full=m)}</div>'
     head = (f'{eyebrow(t, "Talk to us")}<div style="height: 14px"></div>{h2(t, m, "One call with Tom is the fastest way to a number.", 640)}'
             f'<div style="height: 14px"></div>{lead(t, m, "No presentation and no pitch deck. Tell him what you are building and where it stands.", 560)}')
@@ -429,7 +429,7 @@ def selector(t, m):
     return f'<div>{lab}<div style="{br}display: flex; flex-wrap: wrap; gap: {gap}">{chips}</div></div>'
 
 def cta_pkg(t, m):
-    return (f'<div style="display: flex; flex-wrap: wrap; gap: 14px">{btn(t, m, "Get the full breakdown", full=m)}{btn(t, m, "Text Tom: [cell]", primary=False, full=m)}</div>')
+    return (f'<div style="display: flex; flex-wrap: wrap; gap: 14px">{btn(t, m, "Get the full breakdown", full=m)}{btn(t, m, "Text Tom: (724) 272-0182", primary=False, full=m)}</div>')
 
 def hero_pkg(t, m):
     k = t['k']

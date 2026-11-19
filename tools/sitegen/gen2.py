@@ -170,11 +170,12 @@ def badge(kind):
 
 def sample_rom(m):
     rows = ''
-    for flag in ['Tight', 'Tight', 'Moderate', 'Moderate', 'Wide']:
+    bar = lambda w: f'<span role="img" aria-label="Figure removed" style="display: inline-block; width: {w}px; max-width: 100%; height: 12px; background: #D5DBE6; border-radius: 2px; vertical-align: middle"></span>'
+    for name, flag, w in [('Framing and rough carpentry', 'Tight', 86), ('Plumbing', 'Tight', 72), ('Electrical', 'Moderate', 78), ('Concrete and podium', 'Moderate', 82), ('Earthwork and shoring', 'Wide', 64)]:
         rows += (f'<div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr) 92px; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid {BD}; font-size: 15px; color: {MU}">'
-                 f'<span>[Trade division]</span><span style="text-align: right; font-variant-numeric: tabular-nums">[amount]</span><span style="text-align: right">[$ / SF]</span><span>{badge(flag)}</span></div>')
+                 f'<span style="color: {TX}">{name}</span><span style="text-align: right">{bar(w)}</span><span style="text-align: right">{bar(44)}</span><span>{badge(flag)}</span></div>')
     cl = ''
-    for kind, a, b in [('Confirmed', '[Input]', 'Sheet [number]'), ('Assumed', '[Input]', '[Reason]')]:
+    for kind, a, b in [('Confirmed', 'Unit count and mix', 'Read from the cover sheet'), ('Assumed', 'Soil conditions', 'No soils report in the set')]:
         cl += (f'<div style="display: grid; grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid {BD}; font-size: 15px; color: {MU}">'
                f'<span>{badge(kind)}</span><span>{a}</span><span>{b}</span></div>')
     hd = lambda x: f'<div style="font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: {TX}; padding-bottom: 10px">{x}</div>'
@@ -331,6 +332,10 @@ def tabs(m, items):
 # =================================================================== ADDED 19 NOV: partnership, what we build, awarded work, Six Peak
 SIXPEAK = 'https://www.sixpeakcapital.com/'
 TOM_EMAIL = 'tpt@sixpeakcapital.com'
+TOM_PHONE = ('+17242720182', '(724) 272-0182')      # one number for calls and texts (Chris, 19 Nov)
+
+def phone():
+    return f'<a href="tel:{TOM_PHONE[0]}" style="color: #A84A15; font-weight: 600; text-decoration: underline; text-underline-offset: 3px">{TOM_PHONE[1]}</a>'
 
 def mail(addr):
     return f'<a href="mailto:{addr}" style="color: #A84A15; font-weight: 600; text-decoration: underline; text-underline-offset: 3px">{addr}</a>'
@@ -366,11 +371,11 @@ AWARDED = [('8350 Reseda Blvd', 'Northridge', '4% tax credit', '206'), ('6010 Kl
 
 def page_projects(m):
     hero = page_hero(m, 'Projects', 'Wood-frame apartment buildings in the City of Los Angeles.',
-                     '15 buildings completed since 2016, ten under construction and three awarded. Type III and V wood frame, with and without podium or subterranean parking, from 11 to 232 units.', pb=px(m, 40, 24))
+                     'Eight buildings completed since 2020, ten under construction and three awarded. Type III and V wood frame, with and without podium or subterranean parking, from 11 to 232 units.', pb=px(m, 40, 24))
     mapsec = sec(t, m, project_map(m), pt=0, pb=px(m, 72, 40))
     done = sec(t, m, head(m, 'Completed', 'Developed by Six Peak, built by LV') + f'<div style="height: {px(m,40,26)}px"></div>'
                + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,"56px 32px","32px")}">' + ''.join(done_card(m, p) for p in DONE) + '</div>'
-               + f'<div style="margin-top: {px(m,40,28)}px; font-size: 15px; color: {MU}">[Seven earlier completed buildings to be listed]</div>', bg=t['bg2'])
+               , bg=t['bg2'])
     uc = sec(t, m, head(m, 'Under construction', 'Ten projects, 927 units') + f'<div style="height: {px(m,40,24)}px"></div>'
              + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Program', 'left'), ('Units', 'right'), ('Completion', 'right')], UC,
                      total=('Ten projects', '927 units', {0: 'Ten projects', 3: '927'})))
@@ -386,7 +391,7 @@ def page_project(m):
     top = sec(t, m, f'{crumb}<div style="height: {px(m,24,12)}px"></div>{h1(t, m, "Reading", d=84, p=46)}'
               f'<div style="margin-top: 14px; font-size: {px(m,20,17)}px; color: {MU}">8833 Reading Ave, Westchester | Delivered April 2025</div>'
               f'<figure style="margin: {px(m,48,28)}px 0 0"><img src="{B["reading3"]}" alt="Reading from the street corner: five stories, blue tile and white panels" style="display: block; width: 100%; aspect-ratio: {px(m,"16 / 9","4 / 3")}; object-fit: cover">'
-              f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">[Photo credit]</figcaption></figure>'
+              f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">Photography: Envision Media</figcaption></figure>'
               f'<div style="height: {px(m,56,32)}px"></div>'
               + stat_row(m, [('124', 'leasable units'), ('56,200', 'square feet'), ('5 levels', 'of Type III-A over a subterranean garage'), ('2025', 'delivered in April')]),
               pt=px(m, 40, 20), pb=px(m, 80, 48))
@@ -510,9 +515,9 @@ def page_contact(m):
     ph = (f'<div style="width: 96px; height: 96px; flex: none; background: #E2E7F0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; line-height: 1.3; color: {MU}; padding: 8px; box-sizing: border-box">[Photo: Tom Taggart]</div>')
     card = (f'<div style="display: flex; gap: 18px; align-items: center">{ph}<div><div style="font-family: {DISP}; font-weight: 600; font-size: 24px; color: {TX}">Tom Taggart</div>'
             f'<div style="font-size: 16px; color: {MU}">Head of Business Development</div></div></div>'
-            f'<div style="margin-top: 18px; font-size: 17px; line-height: 1.8; color: {TX}"><div>[direct line]</div><div>{mail(TOM_EMAIL)}</div></div>'
+            f'<div style="margin-top: 18px; font-size: 17px; line-height: 1.8; color: {TX}"><div>{phone()}</div><div>{mail(TOM_EMAIL)}</div></div>'
             f'<div style="margin-top: 18px">{btn(t, m, "Book a call", primary=False, full=m)}</div>')
-    nx = [('Tom replies', 'Within [response time].'), ('If you sent a set', 'You get our number within [two weeks]: total, per square foot and per unit, what we assumed, and the places it can move.'),
+    nx = [('Tom replies', 'Himself, by phone or email.'), ('If you sent a set', 'You get our number: total, per square foot and per unit, what we assumed, and the places it can move.'),
           ('No strings', 'It is free, and it is not a bid.')]
     nxt = ''.join(f'<li style="padding: 14px 0; border-top: 1px solid {BD}"><span style="display: block; font-weight: 600; font-size: 17px; color: {TX}">{a}</span><span style="display: block; font-size: 16px; line-height: 1.5; color: {MU}">{b}</span></li>' for a, b in nx)
     side = (f'<div><div style="border-top: 2px solid {TX}; padding-top: 24px">{card}</div>'

@@ -74,6 +74,7 @@ def body(fn, m):
     # photos load only when their layout is showing; the logo loads at once
     b = re.sub(r'<img (?![^>]*alt="LV Construction")', '<img loading="lazy" decoding="async" ', b)
     b = b.replace('<img loading="lazy" decoding="async" ', '<img decoding="async" ', 1)     # the first photo on a page is at the top: load it at once
+    b = re.sub(r'<a href="#"([^>]*)>(Text Tom: [^<]*)</a>', lambda mo: f'<a href="sms:+17242720182"{mo.group(1)}>{mo.group(2)}</a>', b)
     b = re.sub(r'<a href="#"([^>]*)>Download the one-pager</a>', lambda mo: f'<a href="{ONE_PAGER}"{mo.group(1)}>Download the one-pager</a>', b)
     b = b.replace('<form style=', '<form onsubmit="return false" style=').replace('</form>', FORM_NOTE + '</form>')
     if m:   # the phone layout is a second copy of the page: keep element ids unique
