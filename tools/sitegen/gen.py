@@ -265,7 +265,7 @@ def steps(t, m, title='How we price a building', note=None, bg=None, eb='How we 
 # ------------------------------------------------------------------ projects
 PROJ = [('Berryman I', 'Mar Vista', '156 leasable units', 'Delivered 2025', 'berry', 'Berryman I at dusk, seen from above'),
         ('Reading', 'Westchester', '124 leasable units', 'Delivered 2025', 'reading', 'Reading, a five-story blue and white building'),
-        ('Wilton', 'Los Angeles', '132 leasable units', 'Delivered 2026', 'wilton', 'Wilton, seen from the street corner'),
+        ('Wilton', 'Hollywood', '132 leasable units', 'Delivered 2026', 'wilton', 'Wilton, seen from the street corner'),
         ('Venice', 'Mar Vista', '112 leasable units', 'Delivered 2023', 'venice', 'Venice, a four-story white and black building')]
 TRACK = [('8', 'buildings completed since 2020'), ('10', 'under construction, 927 units'),
          ('About $150M', 'bonding capacity for affordable and tax credit work')]

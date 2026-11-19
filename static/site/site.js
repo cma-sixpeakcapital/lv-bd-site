@@ -172,7 +172,7 @@
           title: p.n, alt: p.n,
           icon: L.divIcon({ className: '', html: '<span class="lvpin ' + p.s + '"></span>', iconSize: [18, 18], iconAnchor: [9, 9], popupAnchor: [0, -8] })
         });
-        mk.bindPopup('<b>' + esc(p.n) + '</b>' + esc(p.h) + '<br>' + esc(p.l));
+        mk.bindPopup('<b>' + esc(p.n) + '</b>' + esc(p.h) + '<br>' + esc(p.l) + (p.u ? '<a class="lvmap-more" href="' + esc(p.u) + '">See the building</a>' : ''));
         mk.lvPin = p;
         markers.push(mk);
       });
@@ -193,7 +193,33 @@
     }, { threshold: 0, rootMargin: '300px 0px' });
   }
 
+  /* ---------- 5. contact form ---------- */
+  function initForm(form) {
+    var status = form.querySelector('.lvform-status'), button = form.querySelector('button[type="submit"]'), opened = Date.now();
+    var FALLBACK = 'This did not send. Please email Tom at <a href="mailto:tpt@sixpeakcapital.com">tpt@sixpeakcapital.com</a> or call <a href="tel:+17242720182">(724) 272-0182</a>.';
+    function say(html, bad) { status.innerHTML = html; status.style.color = bad ? '#B42318' : '#0B1833'; }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var data = {}, i, el;
+      for (i = 0; i < form.elements.length; i++) { el = form.elements[i]; if (el.name) data[el.name] = el.value.trim(); }
+      if (!data.name) { say('Please add your name.', true); form.elements.name.focus(); return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email || '')) { say('Please add an email address Tom can reply to.', true); form.elements.email.focus(); return; }
+      data.elapsed = Date.now() - opened;
+      button.disabled = true; button.style.opacity = '0.6';
+      say('Sending...');
+      fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok }; }); })
+        .then(function (res) {
+          if (!res.ok) throw new Error('not sent');
+          all(form, 'div').forEach(function (d) { if (d.parentNode === form) d.style.display = 'none'; });
+          say('<strong style="font-family: \'DM Sans\', Inter, sans-serif; font-size: 22px">Thank you. Your note is with Tom.</strong><br>He will reply to ' + esc(data.email) + '.');
+        })
+        .catch(function () { button.disabled = false; button.style.opacity = '1'; say(FALLBACK, true); });
+    });
+  }
+
   function start() {
+    all(document, '[data-lvform]').forEach(initForm);
     all(document, '[data-count]').forEach(initCount);
     all(document, '[data-lvp]').forEach(initSteps);
     all(document, '[data-lvx]').forEach(initExplainer);

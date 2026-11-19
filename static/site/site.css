@@ -171,6 +171,7 @@ body { margin: 0; background: #FAFAF6; }
 .lvmap .leaflet-popup-content { margin: 12px 16px; font-family: 'Inter','Segoe UI',system-ui,sans-serif; font-size: 14px; line-height: 1.5; color: #475569; }
 .lvmap .leaflet-popup-content b { display: block; font-family: 'DM Sans','Inter','Segoe UI',sans-serif; font-weight: 600; font-size: 17px; color: #0B1833; }
 .lvmap .leaflet-container a, .lvmap a { color: #A84A15; }
+.lvmap a.lvmap-more { display: block; margin-top: 6px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .lvmap-key { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; font-size: 14px; color: #475569; }
 .lvmap-key i { display: inline-block; width: 12px; height: 12px; box-sizing: border-box; margin-right: 8px; border-radius: 50%; vertical-align: -1px; border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px rgba(11,24,51,0.35); }
 .lvmap-key i.done { background: #C4581A; } .lvmap-key i.uc { background: #0B1833; } .lvmap-key i.aw { background: #FFFFFF; border-color: #0B1833; box-shadow: none; }
@@ -182,3 +183,8 @@ body { margin: 0; background: #FAFAF6; }
   .lvx:not([data-scene="0"]) .lvx-band svg { transition: none; }
   .lvp-panel.on, .lvp.auto .lvp-tile.on::after { animation: none; }
 }
+
+/* ---------- contact form ---------- */
+.lvsend:hover { background: #A84A15 !important; }
+.lvsend:focus-visible, [data-lvform] input:focus-visible, [data-lvform] select:focus-visible, [data-lvform] textarea:focus-visible { outline: 3px solid #0B1833; outline-offset: 2px; }
+.lvform-status a { color: #A84A15; font-weight: 600; }

@@ -112,7 +112,7 @@ def wire(body, m):
     for label, tg in WIRE.items():
         body = re.sub(r'<a href="#"([^>]*)>((?:<svg.*?</svg>)?)' + re.escape(label) + r'</a>',
                       lambda mo: f'<a href="{target(tg, m)}"{mo.group(1)}>{mo.group(2)}{label}</a>', body)
-    body = re.sub(r'<a href="#"( style="display: block; text-decoration: none;[^>]*>)(<img[^>]*alt="Reading,)', lambda mo: f'<a href="{target("Project_Reading", m)}"{mo.group(1)}{mo.group(2)}', body)
+    body = re.sub(r'href="#" data-proj="([a-z0-9-]+)"', lambda mo: f'href="{target("Project_" + mo.group(1), m)}"', body)
     return body
 
 def head(m, eb, title, sub=None, mw=820):
@@ -280,11 +280,11 @@ def page_gmp(m):
 DONE = [('Berryman I', 'Mar Vista', '156', '82,700', '2025', 'berry', 'Berryman I at dusk, seen from above'),
         ('Berryman II', 'Mar Vista', '126', '60,500', '2025', 'berry2', 'Berryman II at dusk, from the street'),
         ('Reading', 'Westchester', '124', '56,200', '2025', 'reading', 'Reading, a five-story blue and white building'),
-        ('Wilton', 'Los Angeles', '132', '62,500', '2026', 'wilton', 'Wilton, seen from the street corner'),
+        ('Wilton', 'Hollywood', '132', '62,500', '2026', 'wilton', 'Wilton, seen from the street corner'),
         ('Venice', 'Mar Vista', '112', '54,500', '2023', 'venice', 'Venice, a four-story white and black building'),
-        ('Oxford', 'Los Angeles', '141', '66,500', '2022', 'oxford2', 'Oxford, a seven-story building seen from above'),
+        ('Oxford', 'East Hollywood', '141', '66,500', '2022', 'oxford2', 'Oxford, a seven-story building seen from above'),
         ('Kenmore', 'East Hollywood', '29', '12,000', '2021', 'kenmore', 'Kenmore, a three-story white and dark green building seen from the street'),
-        ('Bonner', 'North Hollywood', '31', '12,000', '2020', 'bonner', 'Bonner, the street front of a white metal-clad building')]
+        ('Bonner', 'North Hollywood', '31', '12,000', '2020', 'bonner', 'Bonner, a white four-story building seen from above, with the valley behind it')]
 UC = [('2859 Francis Ave', 'Koreatown', '4% tax credit', '232', 'Mar 2029'), ('9033 Ramsgate Ave', 'Westchester', 'Market rate', '116', 'Sep 2027'),
       ('11143 Acama St', 'Studio City', '4% tax credit', '131', 'Q2 2029'), ('5365 Crenshaw Blvd', 'South Los Angeles', 'Market rate', '48', 'Dec 2026'),
       ('10953 Whipple St', 'North Hollywood', '4% tax credit', '91', 'Q4 2027'), ('5150 Riverton / 5151 Denny', 'North Hollywood', '4% tax credit', '80', 'Feb 2028'),
@@ -294,7 +294,7 @@ UC = [('2859 Francis Ave', 'Koreatown', '4% tax credit', '232', 'Mar 2029'), ('9
 
 def done_card(m, p, ratio='3 / 2'):
     name, hood, u, sf, yr, key, alt = p
-    return (f'<a href="#" style="display: block; text-decoration: none; color: {TX}"><img src="{B[key]}" alt="{alt}" style="display: block; width: 100%; aspect-ratio: {ratio}; object-fit: cover">'
+    return (f'<a href="#" data-proj="{SLUG[name]}" style="display: block; text-decoration: none; color: {TX}"><img src="{B[key]}" alt="{alt}" style="display: block; width: 100%; aspect-ratio: {ratio}; object-fit: cover">'
             f'<div style="margin-top: 14px; font-family: {DISP}; font-weight: 600; font-size: 24px; color: {TX}">{name}</div>'
             f'<div style="margin-top: 2px; font-size: 15px; color: {MU}">{hood} | Delivered {yr}</div>'
             f'<div style="margin-top: 2px; font-size: 15px; color: {MU}">{u} leasable units | {sf} square feet</div></a>')
@@ -384,33 +384,122 @@ def page_projects(m):
                      total=('Three projects', '297 units', {0: 'Three projects', 3: '297'})), pt=0)
     return ''.join([nav(m, 'projects'), hero, mapsec, done, uc, aw, gen.tom(t, m, bg=t['bg2']), gen.footer(t, m)])
 
-# =================================================================== PROJECT PAGE (Reading)
-def page_project(m):
-    crumb = (f'<nav aria-label="Breadcrumb" style="font-size: 15px; color: {MU}"><a href="#" style="display: inline-flex; align-items: center; min-height: 44px; color: {t["link"]}">Projects</a>'
-             f'<span style="margin: 0 10px">/</span><span>Reading</span></nav>')
-    top = sec(t, m, f'{crumb}<div style="height: {px(m,24,12)}px"></div>{h1(t, m, "Reading", d=84, p=46)}'
-              f'<div style="margin-top: 14px; font-size: {px(m,20,17)}px; color: {MU}">8833 Reading Ave, Westchester | Delivered April 2025</div>'
-              f'<figure style="margin: {px(m,48,28)}px 0 0"><img src="{B["reading3"]}" alt="Reading from the street corner: five stories, blue tile and white panels" style="display: block; width: 100%; aspect-ratio: {px(m,"16 / 9","4 / 3")}; object-fit: cover">'
-              f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">Photography: Envision Media</figcaption></figure>'
-              f'<div style="height: {px(m,56,32)}px"></div>'
-              + stat_row(m, [('124', 'leasable units'), ('56,200', 'square feet'), ('5 levels', 'of Type III-A over a subterranean garage'), ('2025', 'delivered in April')]),
-              pt=px(m, 40, 20), pb=px(m, 80, 48))
-    facts = [('Developer', 'Six Peak Capital'), ('Builder', 'LV Construction'), ('Structure', 'Type III-A wood frame, five levels, over a subterranean garage'),
-             ('Program', '[Program]'), ('Architect', '[Architect]')]
-    fl = ''.join(f'<div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid {BD}; font-size: 16px"><span style="color: {MU}">{a}</span><span style="color: {TX}">{b}</span></div>' for a, b in facts)
-    story = sec(t, m, f'<div style="display: grid; grid-template-columns: {px(m,"minmax(0, 1.2fr) minmax(0, 0.8fr)","minmax(0, 1fr)")}; gap: {px(m,64,32)}px; align-items: start">'
-                f'<div>{head(m, "The job", "What was hard, and what we did about it")}<div style="height: 20px"></div>'
-                f'<p style="margin: 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {TX}">Five levels of Type III-A wood frame over a subterranean garage. Six Peak developed the building and LV built it.</p>'
-                f'<p style="margin: 16px 0 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {MU}">[Two or three sentences from Grady or Pedro: what was hard on this job, and how it was solved.]</p></div>'
-                f'<div>{fl}</div></div>', bg=t['bg2'])
-    gal = [('reading5', 'The street front', 'Reading street front: blue tile with orange window frames'), ('reading10', 'Roof deck', 'Roof deck with a shade sail, grill and seating'),
-           ('reading8', 'Shared kitchen and dining room', 'Shared kitchen with a long dining table')]
-    g = ''.join(f'<figure style="margin: 0"><img src="{B[k]}" alt="{alt}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover"><figcaption style="margin-top: 10px; font-size: 15px; color: {MU}">{c}</figcaption></figure>' for k, c, alt in gal)
-    gallery = sec(t, m, grid(m, 3, g, gap=28, mgap=24), pb=px(m, 40, 24))
-    more = [gen.PROJ[0], gen.PROJ[2], gen.PROJ[3]]
-    others = sec(t, m, head(m, 'More buildings', 'Buildings like this one') + f'<div style="height: {px(m,36,24)}px"></div>'
-                 + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,28,28)}px">' + ''.join(gen.pcard(t, m, p) for p in more) + '</div>')
-    return ''.join([nav(m, 'projects'), top, story, gallery, others, gen.tom(t, m, bg=t['bg2']), gen.footer(t, m)])
+# =================================================================== PROJECT PAGES (the eight completed buildings)
+# Facts and where they came from (19 Nov 2026): structure and architect from each building's City of Los Angeles certificate of occupancy
+# (Berryman I and II, Oxford, Kenmore, Bonner), the March 2026 offering memorandum (Wilton) and the project team directories and architect
+# contracts in the Six Peak Dropbox (Venice, Reading); leasable units, apartments, square feet and delivery from the live site and Tom's pitchbook.
+def _b(name, addr, hood, delivered, lu, apts, sf, levels, levels_note, headline, structure, architect, para, hero, hero_alt, gal, program=None, credit=None):
+    return dict(name=name, addr=addr, hood=hood, delivered=delivered, lu=lu, apts=apts, sf=sf, levels=levels, levels_note=levels_note, headline=headline,
+                structure=structure, architect=architect, para=para, hero=hero, hero_alt=hero_alt, gal=gal, program=program, credit=credit)
+
+BUILT = {
+    'berryman-1': _b('Berryman I', '4339 Berryman Ave', 'Mar Vista', 'August 2025', '156', '28', '82,700', '4 levels', 'of Type III-A over a subterranean garage',
+                     'Four levels of wood frame over a subterranean garage',
+                     'Type III-A wood frame, four levels, over a Type I-A subterranean garage', 'The Albert Group',
+                     'Four levels of Type III-A wood frame over a subterranean garage, with 156 leasable units in 28 apartments and a roof deck. '
+                     'LV built it at the same time as Berryman II, a few doors down the street, and delivered both in August 2025.',
+                     'berry', 'Berryman I at dusk, seen from above: four stories with lit balconies and a roof deck',
+                     [('p_berryman-1_1', 'Roof deck', 'Roof deck at dusk with a fire pit, seating and string lights'),
+                      ('p_berryman-1_2', 'Shared lounge and dining room', 'Shared lounge with a long dining table and a kitchen behind it'),
+                      ('p_berryman-1_3', 'Kitchen', 'Apartment kitchen with white cabinets and bar stools')]),
+    'berryman-2': _b('Berryman II', '4367 Berryman Ave', 'Mar Vista', 'August 2025', '126', '21', '60,500', '4 levels', 'of Type V-A over a subterranean garage',
+                     'Four levels of wood frame over a subterranean garage',
+                     'Type V-A wood frame, four levels, over one level of Type I-A subterranean parking', 'Tighe Architecture',
+                     'Four levels of Type V-A wood frame over one level of subterranean parking, with 126 leasable units in 21 apartments. '
+                     'LV built it at the same time as Berryman I, a few doors up the street, and delivered both in August 2025.',
+                     'p_berryman-2_hero', 'Berryman II at dusk from the street corner: a four-story grey and black building with lit windows',
+                     [('p_berryman-2_1', 'Open-air walkways', 'Open-air walkways with steel railings around a central light court'),
+                      ('p_berryman-2_2', 'Lounge', 'Lounge with a fireplace, a television and seating'),
+                      ('p_berryman-2_3', 'Roof deck', 'Roof deck with lounge chairs and a view over the neighborhood')]),
+    'reading': _b('Reading', '8833 Reading Ave', 'Westchester', 'April 2025', '124', '33', '56,200', '5 levels', 'of Type III-A over a subterranean garage',
+                  'Five levels of wood frame over a subterranean garage',
+                  'Type III-A wood frame, five levels, over a subterranean garage', 'Gruen Associates',
+                  'Five levels of Type III-A wood frame over a subterranean garage, with 124 leasable units in 33 apartments, a courtyard and a roof deck. '
+                  'It was one of three buildings LV delivered in 2025.',
+                  'reading3', 'Reading from the street corner: five stories, blue tile and white panels',
+                  [('reading5', 'The street front', 'Reading street front: blue tile with orange window frames'),
+                   ('reading10', 'Roof deck', 'Roof deck with a shade sail, grill and seating'),
+                   ('reading8', 'Shared kitchen and dining room', 'Shared kitchen with a long dining table')], credit='Photography: Envision Media'),
+    'wilton': _b('Wilton', '620 N Wilton Pl', 'Hollywood', '2026', '132', '26', '62,500', '3 levels', 'of Type V-A over a concrete podium garage',
+                 'Three levels of wood frame over a concrete podium',
+                 'Type V-A wood frame, three levels, over a Type I-A concrete podium garage', 'Tighe Architecture',
+                 'Three levels of Type V-A wood frame over a concrete podium garage, with 132 leasable units in 26 apartments and a roof deck. '
+                 'Delivered in 2026, it is the most recent building LV has completed.',
+                 'p_wilton_hero', 'Wilton at dusk from across the street: a white and dark blue building over a podium',
+                 [('p_wilton_1', 'Roof deck', 'Roof deck with a grill, planters and a view of the Hollywood Hills'),
+                  ('p_wilton_2', 'Lounge', 'Lounge with a curved sofa opening onto a terrace'),
+                  ('p_wilton_3', 'Kitchen', 'Apartment kitchen with white cabinets and a dining table')]),
+    'venice': _b('Venice', '12518 Venice Blvd', 'Mar Vista', 'December 2023', '112', '19', '54,500', '4 levels', 'of Type V over a subterranean garage',
+                 'Four levels of wood frame over a subterranean garage',
+                 'Type V wood frame, four levels, over a subterranean garage', 'Gruen Associates',
+                 'Four levels of Type V wood frame over a subterranean garage on Venice Boulevard, with 112 leasable units in 19 apartments '
+                 'around an open courtyard, and a roof deck above.',
+                 'p_venice_hero', 'Venice from the boulevard: a white and black facade over a green tile base',
+                 [('p_venice_1', 'Courtyard', 'Open courtyard with a round planter and walkways above'),
+                  ('p_venice_2', 'Roof deck', 'Roof deck with a lawn and lounge chairs'),
+                  ('p_venice_3', 'Living room and kitchen', 'Apartment living room with a dining table and kitchen')]),
+    'oxford': _b('Oxford', '660 N Oxford Ave', 'East Hollywood', 'February 2022', '141', '42', '66,500', '7 stories', 'five of Type III-A wood frame over a two-level concrete podium',
+                 'Five levels of wood frame over a two-level podium',
+                 'Type III-A wood frame, five levels, over two levels of Type I-A concrete', 'The Albert Group',
+                 'Five levels of Type III-A wood frame over a two-level concrete podium, seven stories in all, with 141 leasable units in 42 apartments. '
+                 'Five of the apartments are affordable.',
+                 'p_oxford_hero', 'Oxford at dusk from the street corner: a seven-story dark grey and white building with balconies',
+                 [('p_oxford_1', 'Roof deck', 'Roof deck with umbrellas, dining tables and a grill'),
+                  ('p_oxford_2', 'Courtyard', 'Courtyard with string lights, planters and cafe tables'),
+                  ('p_oxford_3', 'Lounge', 'Lounge with long dining tables and floor-to-ceiling windows')],
+                 program='141 leasable units in 42 apartments, five of them affordable'),
+    'kenmore': _b('Kenmore', '1164 N Kenmore Ave', 'East Hollywood', 'July 2021', '29', '5', '12,000', '3 levels', 'of Type V-A over ground-floor parking',
+                  'Three levels of wood frame over ground-floor parking',
+                  'Type V-A wood frame, three levels, over Type I-A ground-floor parking', 'Tighe Architecture',
+                  'Three levels of Type V-A wood frame over ground-floor parking, with 29 leasable units in five apartments and a community room at the street.',
+                  'p_kenmore_hero', 'Kenmore from the street: a three-story white and dark green building behind concrete planters',
+                  [('p_kenmore_1', 'Entry', 'Entry with the address 1164 on a board-formed concrete wall'),
+                   ('p_kenmore_2', 'Community room', 'Community room with a dining table, cactus and blue tile kitchen'),
+                   ('p_kenmore_3', 'Kitchen', 'Apartment kitchen with white cabinets and a dining table')]),
+    'bonner': _b('Bonner', '5544 Bonner Ave', 'North Hollywood', '2020', '31', '5', '12,000', '4 stories', 'Type V-A wood frame over a garage at grade',
+                 'Wood frame over a garage at grade',
+                 'Type V-A wood frame over a Type I-A garage at grade, four stories', 'Tighe Architecture',
+                 'Four stories: Type V-A wood frame over a garage at grade, with 31 leasable units in five apartments. '
+                 'Delivered in 2020, it is the earliest of the eight completed buildings on this site.',
+                 'p_bonner_hero', 'Bonner seen from above: a white four-story building with the San Fernando Valley behind it',
+                 [('p_bonner_1', 'Courtyard', 'Paved courtyard with dining tables, an umbrella and an outdoor kitchen'),
+                  ('p_bonner_2', 'Kitchen', 'Apartment kitchen with white cabinets and a wood dining table'),
+                  ('p_bonner_3', 'Living room', 'Living room with a sofa, armchair and wall-mounted television')]),
+}
+SLUG = {b['name']: slug for slug, b in BUILT.items()}
+
+def project_page(slug):
+    b = BUILT[slug]
+    def page(m):
+        when = f'Delivered {b["delivered"]}'
+        month = b['delivered'].split()[0] if ' ' in b['delivered'] else None
+        crumb = (f'<nav aria-label="Breadcrumb" style="font-size: 15px; color: {MU}"><a href="#" style="display: inline-flex; align-items: center; min-height: 44px; color: {t["link"]}">Projects</a>'
+                 f'<span style="margin: 0 10px">/</span><span>{b["name"]}</span></nav>')
+        cap = f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">{b["credit"]}</figcaption>' if b['credit'] else ''
+        top = sec(t, m, f'{crumb}<div style="height: {px(m,24,12)}px"></div>{h1(t, m, b["name"], d=84, p=46)}'
+                  f'<div style="margin-top: 14px; font-size: {px(m,20,17)}px; color: {MU}">{b["addr"]}, {b["hood"]} | {when}</div>'
+                  f'<figure style="margin: {px(m,48,28)}px 0 0"><img src="{B[b["hero"]]}" alt="{b["hero_alt"]}" style="display: block; width: 100%; aspect-ratio: {px(m,"16 / 9","4 / 3")}; object-fit: cover">{cap}</figure>'
+                  f'<div style="height: {px(m,56,32)}px"></div>'
+                  + stat_row(m, [(b['lu'], 'leasable units'), (b['sf'], 'square feet'), (b['levels'], b['levels_note']),
+                                 (b['delivered'].split()[-1], f'delivered in {month}' if month else 'delivered')]),
+                  pt=px(m, 40, 20), pb=px(m, 80, 48))
+        facts = [('Address', f'{b["addr"]}, {b["hood"]}'), ('Developer', 'Six Peak Capital'), ('Builder', 'LV Construction'), ('Structure', b['structure']),
+                 ('Program', b['program'] or f'{b["lu"]} leasable units in {b["apts"] if int(b["apts"]) > 9 else {"5": "five"}[b["apts"]]} apartments'), ('Architect', b['architect'])]
+        fl = ''.join(f'<div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid {BD}; font-size: 16px"><span style="color: {MU}">{a}</span><span style="color: {TX}">{v}</span></div>' for a, v in facts)
+        story = sec(t, m, f'<div style="display: grid; grid-template-columns: {px(m,"minmax(0, 1.2fr) minmax(0, 0.8fr)","minmax(0, 1fr)")}; gap: {px(m,64,32)}px; align-items: start">'
+                    f'<div>{head(m, "The building", b["headline"])}<div style="height: 20px"></div>'
+                    f'<p style="margin: 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {TX}">{b["para"]}</p>'
+                    f'<p style="margin: 16px 0 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {MU}">Six Peak developed the building and LV built it.</p></div>'
+                    f'<div>{fl}</div></div>', bg=t['bg2'])
+        g = ''.join(f'<figure style="margin: 0"><img src="{B[k]}" alt="{alt}" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover"><figcaption style="margin-top: 10px; font-size: 15px; color: {MU}">{c}</figcaption></figure>' for k, c, alt in b['gal'])
+        gallery = sec(t, m, grid(m, 3, g, gap=28, mgap=24), pb=px(m, 40, 24))
+        names = [d[0] for d in DONE]
+        at = names.index(b['name'])
+        more = [DONE[(at + k) % len(DONE)] for k in (1, 2, 3)]
+        others = sec(t, m, head(m, 'More buildings', 'Buildings like this one') + f'<div style="height: {px(m,36,24)}px"></div>'
+                     + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,28,28)}px">' + ''.join(done_card(m, p, ratio='4 / 3') for p in more) + '</div>')
+        return ''.join([nav(m, 'projects'), top, story, gallery, others, gen.tom(t, m, bg=t['bg2']), gen.footer(t, m)])
+    return page
 
 # =================================================================== AFFORDABLE
 AFF = [('Bonded', 'Payment and performance bonds are in force on five projects. No bond claims, and no failure to complete awarded work.'),
@@ -491,27 +580,33 @@ def page_team(m):
     return ''.join([nav(m, 'team'), hero, lv, sp, bench, gen.tom(t, m), gen.footer(t, m)])
 
 # =================================================================== TALK TO TOM
-def field(fid, label, typ='text', ph='', full=False, kind='input', opts=None):
+def field(fid, label, typ='text', ph='', full=False, kind='input', opts=None, req=False, auto=''):
     base = (f'width: 100%; box-sizing: border-box; min-height: 52px; padding: 12px 14px; border: 1.5px solid rgba(11,24,51,0.32); border-radius: 2px; background: #FFFFFF; '
             f'font-family: {FONT}; font-size: 17px; color: {TX}')
+    nm = f' name="{fid[2:]}"' + (' required' if req else '') + (f' autocomplete="{auto}"' if auto else '')
     lab = f'<label for="{fid}" style="display: block; font-size: 15px; font-weight: 600; color: {TX}; margin-bottom: 6px">{label}</label>'
     if kind == 'select':
-        ctl = f'<select id="{fid}" style="{base}">' + ''.join(f'<option>{o}</option>' for o in opts) + '</select>'
+        ctl = f'<select id="{fid}"{nm} style="{base}">' + ''.join(f'<option>{o}</option>' for o in opts) + '</select>'
     elif kind == 'textarea':
-        ctl = f'<textarea id="{fid}" rows="4" placeholder="{ph}" style="{base}; resize: vertical"></textarea>'
+        ctl = f'<textarea id="{fid}"{nm} rows="4" maxlength="4000" placeholder="{ph}" style="{base}; resize: vertical"></textarea>'
     else:
-        ctl = f'<input id="{fid}" type="{typ}" placeholder="{ph}" style="{base}">'
+        ctl = f'<input id="{fid}"{nm} type="{typ}" maxlength="300" placeholder="{ph}" style="{base}">'
     return f'<div style="{"grid-column: 1 / -1; " if full else ""}">{lab}{ctl}</div>'
 
 def page_contact(m):
     hero = page_hero(m, 'Contact us', 'Tell Tom what you are building.', 'Where it stands, and what you have drawn so far. No presentation and no pitch deck.', d=76, pb=px(m, 48, 28))
-    form = (f'<form style="background: #FFFFFF; border: 1px solid {BD}; padding: {px(m,36,20)}px; display: grid; grid-template-columns: repeat({px(m,2,1)}, minmax(0, 1fr)); gap: 20px">'
-            + field('f-name', 'Name') + field('f-co', 'Company') + field('f-email', 'Email', 'email') + field('f-phone', 'Phone', 'tel')
-            + field('f-addr', 'Project address', full=True) + field('f-units', 'Approximate units')
+    send = (f'<button type="submit" class="lvsend" style="display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 28px; background: {RUST}; color: #FFFFFF; '
+            f'font-family: {FONT}; font-weight: 700; font-size: 19px; border: none; border-radius: {t["rb"]}px; cursor: pointer; {"width: 100%; box-sizing: border-box; " if m else ""}">Send to Tom</button>')
+    trap = ('<div aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden"><label>Leave this empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>')
+    form = (f'<form data-lvform action="/api/contact" method="post" style="position: relative; background: #FFFFFF; border: 1px solid {BD}; padding: {px(m,36,20)}px; display: grid; grid-template-columns: repeat({px(m,2,1)}, minmax(0, 1fr)); gap: 20px">'
+            + field('f-name', 'Name', req=True, auto='name') + field('f-company', 'Company', auto='organization') + field('f-email', 'Email', 'email', req=True, auto='email') + field('f-phone', 'Phone', 'tel', auto='tel')
+            + field('f-address', 'Project address', full=True) + field('f-units', 'Approximate units')
             + field('f-stage', 'Where does the project stand?', kind='select', opts=['A site, nothing drawn', 'Entitlement set', 'Permit-ready drawings', 'A builder is already on'])
-            + field('f-link', 'Link to the plan set, if you have one', 'url', full=True) + field('f-msg', 'Anything else Tom should know', kind='textarea', full=True)
-            + f'<div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; align-items: center">{btn(t, m, "Send to Tom", full=m)}'
-            f'<span style="font-size: 15px; color: {MU}">It is free, and it is not a bid.</span></div></form>')
+            + field('f-link', 'Link to the plan set, if you have one', 'url', full=True) + field('f-message', 'Anything else Tom should know', kind='textarea', full=True)
+            + trap
+            + f'<div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; align-items: center">{send}'
+            f'<span style="font-size: 15px; color: {MU}">It is free, and it is not a bid.</span></div>'
+            f'<p class="lvform-status" role="status" aria-live="polite" style="grid-column: 1 / -1; margin: 0; font-size: 16px; line-height: 1.5; color: {TX}"></p></form>')
     ph = (f'<div style="width: 96px; height: 96px; flex: none; background: #E2E7F0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; line-height: 1.3; color: {MU}; padding: 8px; box-sizing: border-box">[Photo: Tom Taggart]</div>')
     card = (f'<div style="display: flex; gap: 18px; align-items: center">{ph}<div><div style="font-family: {DISP}; font-weight: 600; font-size: 24px; color: {TX}">Tom Taggart</div>'
             f'<div style="font-size: 16px; color: {MU}">Head of Business Development</div></div></div>'
@@ -645,6 +740,7 @@ def pins():
         out.append({'n': name, 'h': hood, 'l': line, 's': status, 'p': {'Market rate': 'mr', '4% tax credit': 'tc'}.get(prog, ''), 'la': la, 'lo': lo})
     for name, hood, u, sf, yr, key, alt in DONE:
         add(name, hood, f'{u} leasable units | Delivered {yr}', 'done', 'Market rate')
+        out[-1]['u'] = target('Project_' + SLUG[name], False)
     for name, hood, prog, u, when in UC:
         add(name, hood, f'{u} units | {prog}' + ('' if when.startswith('[') else f' | Completion {when}'), 'uc', prog)
     for name, hood, prog, u in AWARDED:
@@ -685,6 +781,13 @@ def page_subs(m):
                f'<a href="mailto:{SUBMAIL}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 28px; background: {RUST}; color: #FFFFFF; font-weight: 700; font-size: 19px; '
                f'border-radius: {t["rb"]}px; text-decoration: none; {"width: 100%; box-sizing: border-box; " if m else ""}">{SUBMAIL}</a></div>', pt=0)
     return ''.join([nav(m, None), hero, stat, vet, trades, join, gen.footer(t, m)])
+
+def _pcard(t_, m, p, ratio='4 / 3', big=False):
+    name, hood, units, dlv, key, alt = p
+    return (f'<a href="#" data-proj="{SLUG[name]}" style="display: block; text-decoration: none; color: {TX}"><img src="{B[key]}" alt="{alt}" style="display: block; width: 100%; aspect-ratio: {ratio}; object-fit: cover">'
+            f'<div style="margin-top: 14px; font-family: {DISP}; font-weight: 600; font-size: {26 if big and not m else 21}px; color: {TX}">{name}</div>'
+            f'<div style="margin-top: 2px; font-size: 15px; color: {MU}">{hood} | {units} | {dlv}</div></a>')
+gen.pcard = _pcard      # the homepage's building cards lead to their project pages
 
 # =================================================================== HOME + PACKAGE (round 1 B, corrected)
 def page_home(m):
@@ -732,7 +835,7 @@ def page_banner(m):
     return top + rows + phones
 
 PAGES = [('Home', 'Homepage', page_home), ('Package', 'Package landing page', page_pkg), ('HowWePrice', 'How we price', page_price), ('RomToGmp', 'ROM to GMP', page_gmp),
-         ('Projects', 'Projects', page_projects), ('Project_Reading', 'Project page (Reading)', page_project), ('Affordable', 'Affordable housing', page_afford),
+         ('Projects', 'Projects', page_projects), *[('Project_' + slug, 'Project page (' + BUILT[slug]['name'] + ')', project_page(slug)) for slug in BUILT], ('Affordable', 'Affordable housing', page_afford),
          ('Team', 'Team', page_team), ('TalkToTom', 'Contact us', page_contact), ('Subs', 'Subcontractors', page_subs)]
 BOARDS = []
 for key, name, fn in PAGES:

@@ -16,7 +16,7 @@ How the pages are made
 Moving parts (counting figures, the seven-step graphic, the explainer player, the project map) are in site.js and extra.css
 beside this script; the build copies them into static/site/. The map uses Leaflet, kept in static/site/vendor/.
 
-Still placeholders in the pages: everything in [square brackets], and the contact form, which does not send anywhere yet.
+The contact form posts to /api/contact in app.py, which emails Tom once the sending settings are in place (see the README).
 """
 import hashlib, os, re, shutil, sys, html
 
@@ -37,8 +37,6 @@ PAGES = {
                  'A ROM is a budget. A GMP is a guarantee. The guarantee takes hard bids and a verified start date.'),
     'Projects': ('/projects', 'projects.html', 'Projects | LV Construction',
                  'Wood-frame apartment buildings in the City of Los Angeles: completed, under construction and awarded.'),
-    'Project_Reading': ('/projects/reading', 'projects-reading.html', 'Reading, Westchester | LV Construction',
-                        '8833 Reading Ave, Westchester: developed by Six Peak Capital and built by LV Construction.'),
     'Affordable': ('/affordable-housing', 'affordable-housing.html', 'Affordable housing | LV Construction',
                    'LV Affordable Construction LP builds 4% tax credit housing in Los Angeles, bonded, for sponsors, lenders and investors.'),
     'Team': ('/team', 'team.html', 'Team | LV Construction', 'The people who would build your job: LV Construction leadership, project management, superintendents and office.'),
@@ -57,13 +55,19 @@ for k in list(gen.BLOB):
 
 gen.BLOB['francis'] = IMG + 'francis-rendering.jpg'
 gen.BLOB['bonner'] = IMG + 'bonner.jpg'
+for _slug, _bd in gen2.BUILT.items():           # one page per completed building
+    PAGES['Project_' + _slug] = ('/projects/' + _slug, 'projects-' + _slug + '.html', f'{_bd["name"]}, {_bd["hood"]} | LV Construction',
+                                 f'{_bd["addr"]}, {_bd["hood"]}: developed by Six Peak Capital and built by LV Construction.')
+    for _k in [_bd['hero']] + [g[0] for g in _bd['gal']]:
+        if _k.startswith('p_'):
+            _, _s, _n = _k.split('_')
+            gen.BLOB[_k] = IMG + f'projects/{_s}-{_n}.jpg'
 gen.BLOB['kenmore'] = IMG + 'kenmore.jpg'
 ONE_PAGER = '/static/site/docs/lv-rom-to-gmp-one-pager-draft.pdf'
 
 gen2.target = lambda key, m: PAGES[key][0]     # links go to real routes instead of canvas artboards
 
 TOM = re.compile(r'<div style="width: (\d+)px; height: \d+px; flex: none;[^"]*">\[Photo: Tom Taggart\]</div>')
-FORM_NOTE = ('<p style="grid-column: 1 / -1; margin: 0; font-size: 14px; color: #475569">Draft site: this form is not connected yet and sends nothing.</p>')
 
 
 def body(fn, m):
@@ -76,7 +80,7 @@ def body(fn, m):
     b = b.replace('<img loading="lazy" decoding="async" ', '<img decoding="async" ', 1)     # the first photo on a page is at the top: load it at once
     b = re.sub(r'<a href="#"([^>]*)>(Text Tom: [^<]*)</a>', lambda mo: f'<a href="sms:+17242720182"{mo.group(1)}>{mo.group(2)}</a>', b)
     b = re.sub(r'<a href="#"([^>]*)>Download the one-pager</a>', lambda mo: f'<a href="{ONE_PAGER}"{mo.group(1)}>Download the one-pager</a>', b)
-    b = b.replace('<form style=', '<form onsubmit="return false" style=').replace('</form>', FORM_NOTE + '</form>')
+
     if m:   # the phone layout is a second copy of the page: keep element ids unique
         b = re.sub(r'\b(id|for|aria-labelledby|aria-describedby|aria-controls)="([^"]+)"', lambda mo: f'{mo.group(1)}="m-{mo.group(2)}"', b)
     assert '/_blob/' not in b and '.dc.html' not in b
