@@ -20,6 +20,7 @@ PAGES = {
     "affordable-housing": "affordable-housing.html",
     "team": "team.html",
     "contact": "contact.html",
+    "subcontractors": "subcontractors.html",
 }
 
 # Only these hosts may be listed by search engines. Any other address

@@ -13,10 +13,12 @@ How the pages are made
   Only the layout that is showing loads its photos.
 - Copy, numbers and photos are edited in gen.py / gen2.py, then this script is run again. Do not edit site/*.html by hand.
 
-Still placeholders in the pages: everything in [square brackets], the map, the explainer video, the one-page PDF,
-and the contact form, which does not send anywhere yet.
+Moving parts (counting figures, the seven-step graphic, the explainer player, the project map) are in site.js and extra.css
+beside this script; the build copies them into static/site/. The map uses Leaflet, kept in static/site/vendor/.
+
+Still placeholders in the pages: everything in [square brackets], and the contact form, which does not send anywhere yet.
 """
-import os, re, sys, html
+import hashlib, os, re, shutil, sys, html
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -41,6 +43,8 @@ PAGES = {
                    'LV Affordable Construction LP builds 4% tax credit housing in Los Angeles, bonded, for sponsors, lenders and investors.'),
     'Team': ('/team', 'team.html', 'Team | LV Construction', 'The people who would build your job: LV Construction leadership, project management, superintendents and office.'),
     'TalkToTom': ('/contact', 'contact.html', 'Contact us | LV Construction', 'Tell Tom Taggart what you are building and where it stands.'),
+    'Subs': ('/subcontractors', 'subcontractors.html', 'Subcontractors | LV Construction',
+             'The trade base LV Construction has built job by job: how trades are vetted and the divisions covered.'),
 }
 
 # mockup image key -> file under static/site/img/
@@ -50,6 +54,9 @@ ASSETS = {'berry': 'berryman-1-dusk.jpg', 'berry2': 'berryman-2.jpg', 'reading':
           'reading8': 'reading-interior.jpg', 'grady': 'team/grady-lakamp.jpg', 'logo': 'lv-construction-logo.png'}
 for k in list(gen.BLOB):
     gen.BLOB[k] = IMG + (ASSETS[k] if k in ASSETS else 'team/' + k[len('team_'):] + '.jpg')
+
+gen.BLOB['francis'] = IMG + 'francis-rendering.jpg'
+ONE_PAGER = '/static/site/docs/lv-rom-to-gmp-one-pager-draft.pdf'
 
 gen2.target = lambda key, m: PAGES[key][0]     # links go to real routes instead of canvas artboards
 
@@ -64,6 +71,8 @@ def body(fn, m):
     b = gen2.wire(b, m)
     # photos load only when their layout is showing; the logo loads at once
     b = re.sub(r'<img (?![^>]*alt="LV Construction")', '<img loading="lazy" decoding="async" ', b)
+    b = b.replace('<img loading="lazy" decoding="async" ', '<img decoding="async" ', 1)     # the first photo on a page is at the top: load it at once
+    b = re.sub(r'<a href="#"([^>]*)>Download the one-pager</a>', lambda mo: f'<a href="{ONE_PAGER}"{mo.group(1)}>Download the one-pager</a>', b)
     b = b.replace('<form style=', '<form onsubmit="return false" style=').replace('</form>', FORM_NOTE + '</form>')
     if m:   # the phone layout is a second copy of the page: keep element ids unique
         b = re.sub(r'\b(id|for|aria-labelledby|aria-describedby|aria-controls)="([^"]+)"', lambda mo: f'{mo.group(1)}="m-{mo.group(2)}"', b)
@@ -83,7 +92,8 @@ SHELL = '''<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=DM+Sans:wght@500;600;700&amp;display=swap">
-<link rel="stylesheet" href="/static/site/site.css">
+{head}<link rel="stylesheet" href="/static/site/site.css?v={ver}">
+<script src="/static/site/site.js?v={ver}" defer></script>
 </head>
 <body>
 <div class="lv vd">{desktop}</div>
@@ -114,7 +124,15 @@ body {{ margin: 0; background: {t["bg"]}; }}
 /* On tablets the phone layout is wide: keep headshots from filling the screen. */
 @media (min-width: 560px) and (max-width: 899.98px) {{ .vm img[style*="aspect-ratio: 1 / 1"] {{ max-width: 340px; }} }}
 @media (prefers-reduced-motion: reduce) {{ .lv * {{ transition: none !important; }} }}
-'''
+''' + open(os.path.join(HERE, 'extra.css'), encoding='utf-8').read()
+JS = open(os.path.join(HERE, 'site.js'), encoding='utf-8').read()
+VER = hashlib.sha1((CSS + JS).encode('utf-8')).hexdigest()[:10]      # changes whenever the stylesheet or script changes, so browsers fetch the new one
+MAP_HEAD = ('<link rel="stylesheet" href="/static/site/vendor/leaflet/leaflet.css">\n<script src="/static/site/vendor/leaflet/leaflet.js" defer></script>\n')
+
+
+def shell(title, desc, d, p):
+    return SHELL.format(title=html.escape(title), desc=html.escape(desc, quote=True), desktop=d, phone=p, ver=VER,
+                        head=MAP_HEAD if 'data-lvmap' in d else '')
 
 
 def main():
@@ -124,17 +142,18 @@ def main():
     for key, name, fn in gen2.PAGES:
         route, fname, title, desc = PAGES[key]
         d, p = body(fn, False), body(fn, True)
-        page = SHELL.format(title=html.escape(title), desc=html.escape(desc, quote=True), desktop=d, phone=p)
+        page = shell(title, desc, d, p)
         assert '—' not in page, key
         open(os.path.join(ROOT, 'site', fname), 'w', encoding='utf-8').write(page)
         used |= set(re.findall(r'/static/site/img/([^"\')]+)', page))
         dead[fname] = sorted(set(re.findall(r'<a href="#"[^>]*>(?:<svg.*?</svg>)?([^<]{0,60})', d)))
         print(f'{route:22s} site/{fname:24s} {len(page) // 1024:4d} KB')
     open(os.path.join(ROOT, 'static', 'site', 'site.css'), 'w', encoding='utf-8').write(CSS)
+    open(os.path.join(ROOT, 'static', 'site', 'site.js'), 'w', encoding='utf-8').write(JS)
     nf = lambda m: (gen2.nav(m, None) + gen2.sec(t, m, gen2.head(m, 'Page not found', 'That page is not here.', 'It may have moved when the site was rebuilt.')
                     + '<div style="height: 28px"></div>' + gen2.btn(t, m, 'Projects') + '&nbsp; ' + gen2.btn(t, m, 'Contact us', primary=False)) + gen.footer(t, m))
     open(os.path.join(ROOT, 'site', '404.html'), 'w', encoding='utf-8').write(
-        SHELL.format(title='Page not found | LV Construction', desc='Page not found.', desktop=body(nf, False), phone=body(nf, True)))
+        shell('Page not found | LV Construction', 'Page not found.', body(nf, False), body(nf, True)))
     missing = sorted(u for u in used if not os.path.exists(os.path.join(ROOT, 'static', 'site', 'img', u)))
     print('images used:', len(used), '| missing files:', missing or 'none')
     print('links that lead nowhere yet:')

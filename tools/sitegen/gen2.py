@@ -3,7 +3,7 @@
 import json, os, sys, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gen
-from gen import px, wrap, sec, eyebrow, h2, lead, btn, textlink, logo, icon, h1, FONT, DISP, RUST
+from gen import px, wrap, sec, eyebrow, h2, lead, btn, textlink, logo, icon, h1, cnt, FONT, DISP, RUST
 
 OUT = '/home/claude/lvmock/root2/project'
 gen.BLOB.clear()
@@ -103,8 +103,8 @@ def nav(m, active=None, minimal=False, style=None):
     return f'<header style="background: {DENIM}">{wrap(m, inner)}</header>'
 
 WIRE = {'How we price': 'HowWePrice', 'ROM to GMP': 'RomToGmp', 'Projects': 'Projects', 'All projects': 'Projects', 'Affordable housing': 'Affordable', 'Team': 'Team',
-        'Talk to Tom': 'TalkToTom', 'Contact us': 'TalkToTom', 'Book a call': 'TalkToTom', 'Send a plan set': 'TalkToTom', 'Get the full breakdown': 'TalkToTom',
-        'Ask for the cost sheet': 'TalkToTom', 'Received a package from us?': 'Package', 'Watch the 90-second explainer': 'RomToGmp',
+        'Subcontractors': 'Subs', 'Talk to Tom': 'TalkToTom', 'Contact us': 'TalkToTom', 'Book a call': 'TalkToTom', 'Send a plan set': 'TalkToTom', 'Get the full breakdown': 'TalkToTom',
+        'Ask for the cost sheet': 'TalkToTom', 'Received a package from us?': 'Package', 'Watch the one-minute explainer': 'RomToGmp',
         'See when the number becomes a guarantee': 'RomToGmp'}
 
 def wire(body, m):
@@ -140,7 +140,7 @@ def stat_row(m, items):
     cells = ''
     for i, (n, l) in enumerate(items):
         bl = '' if (i == 0 or (m and i % 2 == 0)) else f'border-left: 1px solid {BD}; padding-left: {px(m,32,18)}px; '
-        cells += (f'<div style="{bl}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,52,36)}px; line-height: 1; letter-spacing: -0.02em; color: {RUST if i == 0 else TX}">{n}</div>'
+        cells += (f'<div style="{bl}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,52,36)}px; line-height: 1; letter-spacing: -0.02em; color: {RUST if i == 0 else TX}">{cnt(n)}</div>'
                   f'<div style="margin-top: 12px; font-size: 15px; line-height: 1.4; color: {MU}">{l}</div></div>')
     return (f'<div style="border-top: 2px solid {TX}; padding-top: {px(m,32,24)}px; display: grid; grid-template-columns: repeat({px(m,len(items),2)}, minmax(0, 1fr)); gap: {px(m,32,24)}px">{cells}</div>')
 
@@ -198,7 +198,7 @@ def page_price(m):
                   + f'<div style="display: grid; grid-template-columns: {px(m,"minmax(0, 0.9fr) minmax(0, 1.1fr)","minmax(0, 1fr)")}; gap: {px(m,56,28)}px; align-items: start">'
                   + f'<ul style="list-style: none; margin: 0; padding: 0">{rec_list}</ul>{sample_rom(m)}</div>')
     def chk(big, text):
-        return (f'<div style="border-top: 2px solid {TX}; padding-top: 20px"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,52,38)}px; line-height: 1; letter-spacing: -0.02em; color: {RUST}">{big}</div>'
+        return (f'<div style="border-top: 2px solid {TX}; padding-top: 20px"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,52,38)}px; line-height: 1; letter-spacing: -0.02em; color: {RUST}">{cnt(big)}</div>'
                 f'<p style="margin: 14px 0 0; font-size: 18px; line-height: 1.5; color: {TX}; max-width: 440px">{text}</p></div>')
     checked = sec(t, m, head(m, 'How it is checked', 'Tested against our own signed and bought-out jobs') + f'<div style="height: {px(m,40,26)}px"></div>'
                   + grid(m, 2, chk('To the dollar', 'The library reproduces a signed $43M GMP through our full markup stack.')
@@ -254,8 +254,8 @@ def window_graphic(m):
             + row('Start after the window', 82, 'The trades re-price. The guarantee has to be reset.', False) + '</div>')
 
 def page_gmp(m):
-    video = (f'<figure style="margin: {px(m,56,32)}px 0 0">{placeholder("[Explainer video: 88 seconds, plays muted]", "16 / 9", dark=True)}'
-             f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">ROM, hard bid and GMP, explained in 90 seconds.</figcaption></figure>')
+    video = (f'<figure style="margin: {px(m,56,32)}px 0 0">{explainer_player(m)}'
+             f'<figcaption style="margin-top: 12px; font-size: 14px; color: {MU}">ROM, hard bid and GMP, explained in about a minute. No sound.</figcaption></figure>')
     hero = sec(t, m, f'{eyebrow(t, "ROM to GMP")}<div style="height: 22px"></div>{h1(t, m, "When does a construction number become a guarantee?", d=68, p=38, mw=980)}'
                f'<div style="height: {px(m,26,20)}px"></div>{lead(t, m, "A project is priced again and again on the way to construction. Only the last number is guaranteed.", 700)}{video}',
                pt=px(m, 88, 44), pb=px(m, 72, 40))
@@ -271,7 +271,7 @@ def page_gmp(m):
                  f'<p style="margin: 0; font-size: {px(m,18,16)}px; line-height: 1.55; color: {MU}">{a}</p></div>' for q, a in FAQ)
     dl = (f'<div style="margin-top: {px(m,40,28)}px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid {BD}; padding: {px(m,28,20)}px">'
           f'<div><div style="font-family: {DISP}; font-weight: 600; font-size: 21px; color: {TX}">Explaining this to your lender or equity partner?</div>'
-          f'<div style="font-size: 16px; color: {MU}; margin-top: 4px">[One-page PDF: ROM to GMP]</div></div>{btn(t, m, "Download the one-pager", primary=False, full=m)}</div>')
+          f'<div style="font-size: 16px; color: {MU}; margin-top: 4px">One page, PDF. Draft.</div></div>{btn(t, m, "Download the one-pager", primary=False, full=m)}</div>')
     faq = sec(t, m, head(m, 'Questions', 'What developers ask us') + f'<div style="height: {px(m,32,20)}px"></div>{qa}{dl}', bg=t['bg2'])
     return ''.join([nav(m, 'gmp'), hero, stg, start, line, faq, gen.tom(t, m), gen.footer(t, m, True)])
 
@@ -336,7 +336,7 @@ PARTNER = [('One team from the first budget', 'Preconstruction, estimating, proj
            ('Competition among the trades', 'Every trade is bid to the market, and you see the bids. That is where competition lowers cost without adding risk.'),
            ('Capital when the deal needs it', 'With ' + ext('Six Peak Capital') + ', we advise on capitalization and, in select circumstances, provide credit enhancement and capital for projects.')]
 
-def partnership(m, bg=None):
+def partnership_static(m, bg=None):
     body = (head(m, 'How we work', 'Partnership, not competition.',
                  'We would rather be your builder from the first budget than one of several bids at the end. Bidding general contractors against each other can lower the number on paper and raise it in the field, through change orders and delay.')
             + f'<p style="margin: 14px 0 0; max-width: 760px; font-size: {px(m,19,17)}px; line-height: 1.6; color: {TX}; font-weight: 600">We can bid your job against other general contractors, and we will if you ask. We do not think it is in your best interest.</p>'
@@ -344,12 +344,12 @@ def partnership(m, bg=None):
     return sec(t, m, body, bg=bg)
 
 BUILD = [('Multifamily', 'Wood-frame, podium and mid-rise apartments, from 11 to 232 units.'),
+         ('Affordable and tax credit', 'Tax credit housing through LV Affordable Construction LP, built for CASp compliance and the investor reporting that tax credit deals require.'),
          ('Mixed-use', 'Ground-floor retail with apartments above, including complex podium structures.'),
-         ('Commercial', 'Ground-up commercial, drawing on our podium and concrete experience.'),
-         ('Affordable and tax credit', 'Tax credit housing through LV Affordable Construction LP, built for CASp compliance and the investor reporting that tax credit deals require.')]
+         ('Commercial', 'Ground-up commercial, drawing on our podium and concrete experience.')]
 
 def what_we_build(m, bg=None):
-    body = (head(m, 'What we build', 'Multifamily, mixed-use, commercial and affordable.') + f'<div style="height: {px(m,40,26)}px"></div>'
+    body = (head(m, 'What we build', 'Multifamily, affordable, mixed-use and commercial.') + f'<div style="height: {px(m,40,26)}px"></div>'
             + grid(m, 4, ''.join(ruled(m, a, b) for a, b in BUILD), gap=32, mgap=24))
     return sec(t, m, body, bg=bg)
 
@@ -360,9 +360,7 @@ AWARDED = [('8350 Reseda Blvd', 'Northridge', '4% tax credit', '206'), ('6010 Kl
 def page_projects(m):
     hero = page_hero(m, 'Projects', 'Wood-frame apartment buildings in the City of Los Angeles.',
                      '15 buildings completed since 2016, ten under construction and three awarded. Type III and V wood frame, with and without podium or subterranean parking, from 11 to 232 units.', pb=px(m, 40, 24))
-    mapsec = sec(t, m, tabs(m, ['All', 'Completed', 'Under construction', 'Awarded', 'Market rate', 'Tax credit']) + f'<div style="height: {px(m,32,20)}px"></div>'
-                 + f'<div style="aspect-ratio: {px(m,"21 / 8","4 / 3")}; background: #E2E7F0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; font-size: 15px; color: {MU}">[Map of Los Angeles: one pin for each LV building]</div>',
-                 pt=0, pb=px(m, 72, 40))
+    mapsec = sec(t, m, project_map(m), pt=0, pb=px(m, 72, 40))
     done = sec(t, m, head(m, 'Completed', 'Developed by Six Peak, built by LV') + f'<div style="height: {px(m,40,26)}px"></div>'
                + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,"56px 32px","32px")}">' + ''.join(done_card(m, p) for p in DONE) + '</div>'
                + f'<div style="margin-top: {px(m,40,28)}px; font-size: 15px; color: {MU}">[Nine more completed buildings to add, Bonner and Kenmore among them]</div>', bg=t['bg2'])
@@ -424,7 +422,8 @@ def page_afford(m):
               f'<div>{head(m, "Owner and builder", "We sit on your side of the closing table too.")}<div style="height: 18px"></div>'
               f'<p style="margin: 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {MU}">2859 Francis Ave, 232 units in Koreatown, is a Six Peak 4% tax credit project, with LV as the builder. We have closed it as the sponsor, so we price and schedule yours as an owner would.</p>'
               f'<p style="margin: 16px 0 0; font-size: {px(m,19,17)}px; line-height: 1.6; color: {MU}">In select circumstances, {ext("Six Peak Capital")} provides credit enhancement and capital for projects.</p></div>'
-              f'<div style="aspect-ratio: 4 / 3; background: #E2E7F0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; font-size: 15px; color: {MU}">[Rendering: 2859 Francis Ave, labeled as a rendering]</div></div>', bg=t['bg2'])
+              f'<figure style="margin: 0"><img src="{B["francis"]}" alt="Rendering of 2859 Francis Ave: white residential floors over a red brick base, seen from the street" style="display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover">'
+              f'<figcaption style="margin-top: 10px; font-size: 14px; color: {MU}">Rendering. 2859 Francis Ave, Koreatown, 232 units.</figcaption></figure></div>', bg=t['bg2'])
     nxt = sec(t, m, head(m, 'Awarded', 'Next: 206 units in Northridge', '8350 Reseda Blvd is a Six Peak joint venture: 206 units, all affordable, financed with 4% tax credits. LV Affordable Construction LP is the builder.')
               + f'<div style="height: {px(m,36,22)}px"></div>'
               + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Units', 'right'), ('Stage', 'right')], [('8350 Reseda Blvd', 'Northridge', '206', 'Awarded, in preconstruction')]), pt=0)
@@ -432,8 +431,8 @@ def page_afford(m):
 
 # =================================================================== TEAM
 LEAD_LV = [('Grady Lakamp', 'Founding Partner and CEO', '[Bio to come from Grady]'),
-           ('Tom Taggart', 'Head of Business Development', '[Tom\'s approved bio]'),
-           ('Pedro Rosales', 'Vice President', 'Leads construction operations: team development, project buyout, budget management and client relationships.')]
+           ('Pedro Rosales', 'Vice President', 'Leads construction operations: team development, project buyout, budget management and client relationships.'),
+           ('Tom Taggart', 'Head of Business Development', '[Tom\'s approved bio]')]
 LEAD_SP = [('Chris Aiello', 'Founding Partner, Six Peak Capital', 'Co-founded Six Peak in 2016 in partnership with the Steyn Group. Leads Los Angeles acquisitions and development, and equity and debt capital markets.'),
            ('Bob Kennedy', 'Founding Partner, Six Peak Capital', 'Based in New York. Leads company operations and assists with tax credit and affordable housing execution.'),
            ('Justin Krueger', 'Founder and CEO, Icon National', 'Strategic partner to LV Construction.')]
@@ -515,6 +514,166 @@ def page_contact(m):
     body = sec(t, m, f'<div style="display: grid; grid-template-columns: {px(m,"minmax(0, 1.25fr) minmax(0, 0.75fr)","minmax(0, 1fr)")}; gap: {px(m,64,36)}px; align-items: start">{form}{side}</div>', pt=0)
     return ''.join([nav(m, None), hero, body, gen.footer(t, m)])
 
+
+# =================================================================== ADDED 19 NOV (draft site): process graphic, explainer player, map, subcontractors
+# These pieces move, so they need static/site/site.js and the rules in extra.css. They are built for the site, not for the design canvas.
+def svg48(path):
+    return ('<svg aria-hidden="true" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>')
+
+PROC_IC = {
+    'talk': '<path d="M8 10h22a3 3 0 013 3v12a3 3 0 01-3 3H18l-8 7v-7H8a3 3 0 01-3-3V13a3 3 0 013-3z"></path><path d="M38 18h2a3 3 0 013 3v11a3 3 0 01-3 3h-1v6l-7-6h-8"></path>',
+    'calc': '<rect x="10" y="6" width="28" height="36" rx="2"></rect><rect x="15" y="11" width="18" height="8"></rect><path d="M17 27h2M23 27h2M29 27h2M17 34h2M23 34h2M29 34h2"></path>',
+    'stack': '<path d="M6 18l18-10 18 10-18 10z"></path><path d="M6 26l18 10 18-10"></path><path d="M6 34l18 10 18-10"></path>',
+    'book': '<path d="M8 9h12c2 0 4 2 4 4v25c0-2-2-3-4-3H8z"></path><path d="M40 9H28c-2 0-4 2-4 4v25c0-2 2-3 4-3h12z"></path><path d="M13 17h5M13 23h5M30 17h5M30 23h5"></path>',
+    'shield': '<path d="M24 4L8 11v12c0 10 7 17 16 21 9-4 16-11 16-21V11z"></path><path d="M17 24l5 5 9-10"></path>',
+    'crane': '<path d="M16 42V8"></path><path d="M8 42h16"></path><path d="M16 8l22 4"></path><path d="M16 8l-8 6"></path><path d="M34 11v11"></path><path d="M30 22h8v7h-8z"></path><path d="M16 18h0"></path>',
+    'flag': '<path d="M10 43V7"></path><path d="M10 9c5-3 9-2 13 0s8 3 13 0v17c-5 3-9 2-13 0s-8-3-13 0"></path>',
+}
+PROCESS = [
+    ('Partnership alignment', 'talk', 'Your builder from the first budget, not one of several bids.',
+     'We start with a plain conversation about your goals, capital structure and timeline. If there is a fit, we come on as your builder from the first budget. '
+     'Preconstruction, estimating, project management and field supervision are in-house, so the team that budgets your building is the team that builds it.',
+     ['Scope review', 'Timeline', 'Team fit']),
+    ('Preconstruction and budgeting', 'calc', 'A line-item budget from our own bought-out costs, at no cost.',
+     'You get a line-item estimate priced from our library of bought-out subcontract costs, at no cost, so you can settle your underwriting before the equity and debt conversations. '
+     'As the drawings develop, we update the estimate from the new plans.',
+     ['Line-item estimate', 'Our own cost data', 'Underwriting support']),
+    ('Project capitalization', 'stack', 'Six Peak advises on the capital stack.',
+     'With ' + ext('Six Peak Capital') + ', we advise on capitalization and, in select circumstances, provide credit enhancement and capital for projects. '
+     'With equity and debt committed, the hard bid is timed to the construction loan closing.',
+     ['Capital advisory', 'Credit enhancement', 'Loan coordination']),
+    ('Subcontractor bidding', 'book', 'Every trade bid to the market, with the book open.',
+     'With a closing and a start date in clear sight, scoped bid packages go out to our trade base. We level the bids scope for scope, and you see every number we see. '
+     'That is where competition lowers cost without adding risk. Full bidding takes seven to nine weeks.',
+     ['Scope-for-scope leveling', 'Open book', 'Seven to nine weeks']),
+    ('Guaranteed maximum price', 'shield', 'Backed by hard bids, built for your lender.',
+     'With hard bids in hand and a verified start date, LV commits to a guaranteed maximum price. It rests on subcontractor bids, not estimates, '
+     'which gives your lender and investor the certainty to close.',
+     ['Hard bids in hand', 'Verified start date', 'Lender ready']),
+    ('Mobilization', 'crane', 'Contracts signed, trades bought out, ground broken.',
+     'With contracts signed and buyout under way, we mobilize. Established trade relationships mean a fast buyout, clean contracts and a site team ready to break ground.',
+     ['Contracts', 'Buyout', 'Site ready']),
+    ('Construction and closeout', 'flag', 'Managed to certificate of occupancy, reported monthly.',
+     'From groundbreaking to certificate of occupancy, we track cost and schedule as the job runs and report monthly, so the owner, the lender and the investor see the same picture. '
+     'Closeout ends with a clean turnover.',
+     ['Cost tracking', 'Monthly reporting', 'Clean turnover']),
+]
+
+PROC_SHORT = {'Preconstruction and budgeting': 'Precon and budgeting'}     # the tiles are narrow; the panel carries the full title
+
+def process(m):
+    n = len(PROCESS)
+    dots = ''.join('<i></i>' for _ in PROCESS)
+    tiles, panels = '', ''
+    for i, (title, ic, brief, desc, tags) in enumerate(PROCESS):
+        on = i == 0
+        tiles += (f'<button type="button" role="tab" id="lvp-tab-{i+1}" aria-controls="lvp-panel-{i+1}" aria-selected="{"true" if on else "false"}" tabindex="{0 if on else -1}" class="lvp-tile{" on" if on else ""}">'
+                  f'<span class="lvp-ic">{svg48(PROC_IC[ic])}</span><span class="lvp-n">{i+1}</span><span class="lvp-t">{PROC_SHORT.get(title, title)}</span><span class="lvp-b">{brief}</span></button>')
+        chips = ''.join(f'<li>{x}</li>' for x in tags)
+        panels += (f'<div role="tabpanel" id="lvp-panel-{i+1}" aria-labelledby="lvp-tab-{i+1}" class="lvp-panel{" on" if on else ""}"{"" if on else " hidden"}>'
+                   f'<div class="lvp-num"><b>{i+1}</b><span>Step</span></div>'
+                   f'<div><h3>{title}</h3><p>{desc}</p><ul>{chips}</ul></div></div>')
+    return (f'<div class="lvp" data-lvp style="--n: {n}">'
+            f'<div class="lvp-track" aria-hidden="true"><div class="lvp-fill"></div>{dots}</div>'
+            f'<div class="lvp-tiles" role="tablist" aria-label="How a job runs with LV, in seven steps">{tiles}</div>'
+            f'<div class="lvp-card">{panels}'
+            f'<div class="lvp-ctl"><button type="button" class="lvp-prev">Previous</button><button type="button" class="lvp-next">Next step</button>'
+            f'<span class="lvp-count">Step 1 of {n}</span></div></div></div>')
+
+def partnership(m, bg=None):
+    """Homepage. A navy band with the seven-step graphic, to break up the light sections around it."""
+    hd = (f'{eyebrow(t, "How we work", GLOW)}<div style="height: 14px"></div>'
+          f'<h2 style="margin: 0; font-family: {DISP}; font-weight: 600; font-size: {px(m,44,30)}px; line-height: 1.1; letter-spacing: -0.01em; color: {GHOST}; max-width: 820px">Partnership, not competition.</h2>'
+          f'<div style="height: 16px"></div>'
+          f'<p style="margin: 0; font-size: {px(m,19,17)}px; line-height: 1.55; color: #BFC7DA; max-width: 720px">We would rather be your builder from the first budget than one of several bids at the end. '
+          f'Bidding general contractors against each other can lower the number on paper and raise it in the field, through change orders and delay.</p>'
+          f'<p style="margin: 14px 0 0; max-width: 760px; font-size: {px(m,19,17)}px; line-height: 1.6; color: {GHOST}; font-weight: 600">We can bid your job against other general contractors, and we will if you ask. We do not think it is in your best interest.</p>')
+    sub = (f'<div style="margin-top: {px(m,56,36)}px; padding-top: 20px; border-top: 1px solid rgba(191,199,218,0.28); display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: baseline">'
+           f'{eyebrow(t, "Seven steps, from first call to keys", GLOW)}<div style="font-size: 14px; color: #BFC7DA">Select a step to read it.</div></div>'
+           f'<div style="height: {px(m,28,20)}px"></div>')
+    return sec(t, m, hd + sub + process(m), bg=DENIM)
+
+# ------------------------------------------------------------------ explainer player (ROM to GMP)
+XSTAGE = [('ROM', 'Built from early plans and our own bid history. Use it to underwrite the deal. It is a budget, not a price.', 'No', 'no'),
+          ('Precon updates', 'As the drawings develop, we update the estimate from the new plans, and the range narrows. It is still a budget.', 'No', 'no'),
+          ('Hard bid', 'With a closing and a start date in clear sight, the job goes to subcontractors for hard bids. Real prices, good for a limited time.', 'Not yet', 'notyet'),
+          ('GMP', 'Hard bids in hand and a verified start date: now LV commits. Cost of the work plus our fee, capped at the GMP.', 'Yes', 'yes')]
+
+def explainer_player(m):
+    cols = ''.join(f'<div class="lvx-col" data-i="{i+2}"><span>Stage {i+1}</span><b>{n}</b></div>' for i, (n, _, _, _) in enumerate(XSTAGE))
+    caps = '<div class="lvx-cap" data-i="1"><p>A project is priced again and again on the way to construction. Only the last number is guaranteed.</p></div>'
+    caps += ''.join(f'<div class="lvx-cap" data-i="{i+2}"><p>{c}</p><div class="lvx-g">Guaranteed? <b class="{k}">{a}</b></div></div>' for i, (_, c, a, k) in enumerate(XSTAGE))
+    band = ('<svg aria-hidden="true" viewBox="0 0 1000 200" preserveAspectRatio="none"><polygon points="0,8 250,44 500,74 750,94 750,106 500,126 250,156 0,192" fill="rgba(142,163,190,0.42)"></polygon>'
+            f'<line x1="750" y1="100" x2="1000" y2="100" stroke="{GLOW}" stroke-width="6" vector-effect="non-scaling-stroke"></line>'
+            + ''.join(f'<line x1="{x}" y1="0" x2="{x}" y2="200" stroke="rgba(191,199,218,0.25)" stroke-width="1" vector-effect="non-scaling-stroke"></line>' for x in (250, 500, 750)) + '</svg>')
+    play = '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path class="lvx-i-play" d="M7 4.5v15l13-7.5z"></path><path class="lvx-i-pause" d="M6 4.5h4.5v15H6zM13.5 4.5H18v15h-4.5z"></path></svg>'
+    return (f'<div class="lvx" data-lvx data-scene="0" role="group" aria-label="Animated explainer: when a construction number becomes a guarantee. The same four stages are written out below.">'
+            f'<div class="lvx-stage">'
+            f'<div class="lvx-title"><span>ROM to GMP</span>When does a construction number become a guarantee?</div>'
+            f'<div class="lvx-chart"><div class="lvx-kick">Four stages. One guarantee.</div><div class="lvx-cols">{cols}</div>'
+            f'<div class="lvx-band">{band}<div class="lvx-hl"></div></div><div class="lvx-caps">{caps}</div></div>'
+            f'<div class="lvx-end"><p>A ROM is a budget.<br>A GMP is a <em>guarantee</em>.</p><p class="lvx-end2">The guarantee takes hard bids and a verified start date.</p><span>LV Construction</span></div>'
+            f'</div>'
+            f'<div class="lvx-bar"><button type="button" class="lvx-pp" aria-label="Play">{play}</button><div class="lvx-prog" aria-hidden="true"><i></i></div>'
+            f'<button type="button" class="lvx-re">Replay</button></div></div>')
+
+# ------------------------------------------------------------------ project map
+GEO = {'Berryman I': (34.00081, -118.41519), 'Berryman II': (34.00058, -118.41461), 'Reading': (33.95781, -118.38169), 'Wilton': (34.08223, -118.31343),
+       'Venice': (34.00319, -118.43503), 'Oxford': (34.08277, -118.30789), '2859 Francis Ave': (34.05690, -118.28801), '9033 Ramsgate Ave': (33.95471, -118.38276),
+       '11143 Acama St': (34.14627, -118.37346), '5365 Crenshaw Blvd': (33.99352, -118.33111), '10953 Whipple St': (34.14815, -118.36883),
+       '5150 Riverton / 5151 Denny': (34.16396, -118.36490), '11218 Califa St': (34.17752, -118.37518), '5655 Lexington Ave': (34.09286, -118.31236),
+       '5614 Troost Ave': (34.17250, -118.38653), '1172 Nelrose Ave': (33.99386, -118.45076), '8350 Reseda Blvd': (34.22177, -118.53598),
+       '6010 Klump Ave': (34.17970, -118.37566), '2227 W Scott Ave': (34.08271, -118.26287)}
+FILTERS = [('all', 'All'), ('done', 'Completed'), ('uc', 'Under construction'), ('aw', 'Awarded'), ('mr', 'Market rate'), ('tc', 'Tax credit')]
+
+def pins():
+    out = []
+    def add(name, hood, line, status, prog):
+        la, lo = GEO[name]
+        out.append({'n': name, 'h': hood, 'l': line, 's': status, 'p': {'Market rate': 'mr', '4% tax credit': 'tc'}.get(prog, ''), 'la': la, 'lo': lo})
+    for name, hood, u, sf, yr, key, alt in DONE:
+        add(name, hood, f'{u} leasable units | Delivered {yr}', 'done', 'Market rate')
+    for name, hood, prog, u, when in UC:
+        add(name, hood, f'{u} units | {prog}' + ('' if when.startswith('[') else f' | Completion {when}'), 'uc', prog)
+    for name, hood, prog, u in AWARDED:
+        add(name, hood, f'{u} units | {prog}', 'aw', prog)
+    return out
+
+def project_map(m):
+    data = json.dumps(pins(), separators=(',', ':')).replace('&', '&amp;').replace('"', '&quot;')
+    chips = ''.join(f'<button type="button" class="lvtab" data-filter="{k}" aria-pressed="{"true" if i == 0 else "false"}">{l}</button>' for i, (k, l) in enumerate(FILTERS))
+    key = ('<span><i class="done"></i>Completed</span><span><i class="uc"></i>Under construction</span><span><i class="aw"></i>Awarded</span>')
+    return (f'<div class="lvmapwrap" data-lvmapwrap><div class="lvtabs" role="group" aria-label="Show on the map">{chips}</div>'
+            f'<div style="height: {px(m,32,20)}px"></div>'
+            f'<div class="lvmap" data-lvmap data-pins="{data}" role="region" aria-label="Map of Los Angeles with one pin for each LV building" style="aspect-ratio: {px(m,"21 / 9","4 / 5")}"></div>'
+            f'<div class="lvmap-key">{key}<span class="lvmap-n" aria-live="polite"></span></div></div>')
+
+# ------------------------------------------------------------------ subcontractors
+VET = [('Financial qualification', 'Bonding, insurance and balance sheet.'), ('Track record', 'References, on-time history and similar project types.'),
+       ('Safety', 'Experience modification rate, OSHA history and site programs.')]
+TRADES = ['Structural concrete', 'Framing and carpentry', 'Mechanical (HVAC)', 'Electrical', 'Plumbing', 'Elevators', 'Glazing and windows', 'Fire protection',
+          'Roofing and waterproofing', 'Drywall and finishes']
+SUBMAIL = 'admin@lvllc.com'
+
+def page_subs(m):
+    hero = page_hero(m, 'Subcontractors', 'A trade base built job by job.',
+                     'We keep long-standing relationships with trade partners across every major division. It is a network built over years, not a directory, and it is why our schedules hold and our pricing is real.', pb=px(m, 56, 32))
+    stat = sec(t, m, f'<div style="border-top: 2px solid {TX}; padding-top: {px(m,32,24)}px; display: grid; grid-template-columns: {px(m,"auto minmax(0, 1fr)","minmax(0, 1fr)")}; gap: {px(m,48,12)}px; align-items: center">'
+               f'<div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,112,72)}px; line-height: 1; letter-spacing: -0.03em; color: {RUST}">{cnt("70%")}</div>'
+               f'<p style="margin: 0; font-family: {DISP}; font-weight: 600; font-size: {px(m,30,22)}px; line-height: 1.25; color: {TX}; max-width: 640px">of our trade partners have worked with us on three or more projects.</p></div>',
+               pt=0, pb=px(m, 88, 48))
+    vet = sec(t, m, head(m, 'How we vet', 'Three things we check before a trade bids our work') + f'<div style="height: {px(m,40,26)}px"></div>'
+              + grid(m, 3, ''.join(ruled(m, a, b, num=f'0{i+1}') for i, (a, b) in enumerate(VET)), gap=40, mgap=24), bg=t['bg2'])
+    cells = ''.join(f'<li style="border-top: 1px solid {TX}; padding: 16px 0; font-family: {DISP}; font-weight: 600; font-size: {px(m,21,18)}px; color: {TX}">{x}</li>' for x in TRADES)
+    trades = sec(t, m, head(m, 'Trade coverage', 'Ten trades, every major division') + f'<div style="height: {px(m,36,22)}px"></div>'
+                 + f'<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat({px(m,5,2)}, minmax(0, 1fr)); gap: 0 {px(m,28,18)}px">{cells}</ul>')
+    join = sec(t, m, f'<div style="border-top: 2px solid {TX}; border-bottom: 2px solid {TX}; padding: {px(m,48,28)}px 0; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between">'
+               f'<div><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,34,24)}px; line-height: 1.15; color: {TX}">Want to bid LV work?</div>'
+               f'<p style="margin: 10px 0 0; font-size: {px(m,18,16)}px; line-height: 1.55; color: {MU}; max-width: 620px">Send your trade, your license number and three recent projects to our office.</p></div>'
+               f'<a href="mailto:{SUBMAIL}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 28px; background: {RUST}; color: #FFFFFF; font-weight: 700; font-size: 19px; '
+               f'border-radius: {t["rb"]}px; text-decoration: none; {"width: 100%; box-sizing: border-box; " if m else ""}">{SUBMAIL}</a></div>', pt=0)
+    return ''.join([nav(m, None), hero, stat, vet, trades, join, gen.footer(t, m)])
+
 # =================================================================== HOME + PACKAGE (round 1 B, corrected)
 def page_home(m):
     return ''.join([nav(m, None), gen.hero_home(t, m), gen.counters(t, m), gen.explainer(t, m), gen.projects(t, m, bg=t['bg2']), partnership(m), what_we_build(m, bg=t['bg2']),
@@ -562,7 +721,7 @@ def page_banner(m):
 
 PAGES = [('Home', 'Homepage', page_home), ('Package', 'Package landing page', page_pkg), ('HowWePrice', 'How we price', page_price), ('RomToGmp', 'ROM to GMP', page_gmp),
          ('Projects', 'Projects', page_projects), ('Project_Reading', 'Project page (Reading)', page_project), ('Affordable', 'Affordable housing', page_afford),
-         ('Team', 'Team', page_team), ('TalkToTom', 'Contact us', page_contact)]
+         ('Team', 'Team', page_team), ('TalkToTom', 'Contact us', page_contact), ('Subs', 'Subcontractors', page_subs)]
 BOARDS = []
 for key, name, fn in PAGES:
     for dev in ('Desktop', 'Phone'):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generates the round 1 LV website mockups: 3 directions x 2 pages x 2 widths."""
-import json, os, sys
+import json, os, re, sys
 
 OUT = '/home/claude/lvmock/root/project'
 BLOB = {
@@ -37,6 +37,13 @@ T = {
 # ------------------------------------------------------------------ atoms
 def px(m, d, p):
     return p if m else d
+
+def cnt(n):
+    """Mark a figure to count up when it scrolls into view (site.js). Years and words are left alone."""
+    n = str(n)
+    if re.fullmatch(r'(19|20)\d\d', n) or not re.search(r'\d', n):
+        return n
+    return f'<span data-count style="font-variant-numeric: tabular-nums">{n}</span>'
 
 def wrap(m, inner, extra=''):
     return f'<div style="max-width: 1200px; margin: 0 auto; padding: 0 {px(m,80,20)}px; box-sizing: border-box; {extra}">{inner}</div>'
@@ -144,12 +151,12 @@ def stages(t, m, compact=False, marker=False, h=150):
     cells = ''
     for i, (name, sub, desc, ans, key) in enumerate(STAGES):
         d = '' if compact else f'<div style="font-size: 15px; line-height: 1.5; color: {t["muted"]}; margin-top: 8px">{desc}</div>'
-        cells += (f'<div style="padding: 18px 24px 0 0">'
+        cells += (f'<div style="padding: 18px 24px 0 0; display: flex; flex-direction: column">'
                   f'<div style="font-size: 13px; font-weight: 600; color: {t["muted"]}">Stage {i+1}</div>'
                   f'<div style="font-family: {DISP}; font-weight: 600; font-size: {20 if compact else 24}px; color: {t["text"]}; margin-top: 2px">{sub if compact else name}</div>'
                   f'{d}'
-                  f'<div style="margin-top: 14px; font-size: 14px; color: {t["muted"]}">Guaranteed?</div>'
-                  f'<div style="font-family: {DISP}; font-weight: 700; font-size: {24 if compact else 28}px; color: {t[key]}">{ans}</div></div>')
+                  f'<div style="margin-top: auto; padding-top: 14px"><div style="font-size: 14px; color: {t["muted"]}">Guaranteed?</div>'
+                  f'<div style="font-family: {DISP}; font-weight: 700; font-size: {24 if compact else 28}px; color: {t[key]}">{ans}</div></div></div>')
     return f'{mk}{band_svg(t, h)}<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">{cells}</div>'
 
 ONE_LINE = 'A ROM is a budget. A GMP is a guarantee. The guarantee takes hard bids and a verified start date.'
@@ -161,7 +168,7 @@ def explainer(t, m, compact=False, marker=False, bg=None, title='When does a con
              f'border-top: 1px solid {t["border"]}; padding-top: {px(m,32,24)}px">'
              f'<div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,26,21)}px; line-height: 1.25; color: {t["text"]}; max-width: 720px">{ONE_LINE}</div>'
              f'<a href="#" style="display: inline-flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 24px; border: 1.5px solid {t["text"]}; color: {t["text"]}; '
-             f'font-weight: 600; font-size: 17px; border-radius: {t["rb"]}px; text-decoration: none; box-sizing: border-box">{icon(IC_PLAY, t["text"], 22)}Watch the 90-second explainer</a></div>')
+             f'font-weight: 600; font-size: 17px; border-radius: {t["rb"]}px; text-decoration: none; box-sizing: border-box">{icon(IC_PLAY, t["text"], 22)}Watch the one-minute explainer</a></div>')
     body = f'{head}<div style="height: {px(m,48,28)}px"></div>{stages(t, m, compact, marker)}{"" if compact else close}'
     return sec(t, m, body, bg=bg)
 
@@ -184,7 +191,7 @@ def counters(t, m):
         cells = ''
         for i, (n, l) in enumerate(COUNTERS):
             bl = '' if (i == 0 or (m and i % 2 == 0)) else f'border-left: 1px solid {t["border"]}; padding-left: {px(m,32,18)}px; '
-            cells += (f'<div style="{bl}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,60,40)}px; line-height: 1; letter-spacing: -0.02em; color: {t["accent"] if i == 0 else t["text"]}">{n}</div>'
+            cells += (f'<div style="{bl}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,60,40)}px; line-height: 1; letter-spacing: -0.02em; color: {t["accent"] if i == 0 else t["text"]}">{cnt(n)}</div>'
                       f'<div style="margin-top: 12px; font-size: 15px; line-height: 1.4; color: {t["muted"]}">{l}</div></div>')
         body = (f'<div style="border-top: 2px solid {t["text"]}; padding-top: 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px">'
                 f'{eyebrow(t, "The cost library behind every number")}<div style="font-size: 13px; color: {t["fine"]}">{ASOF}</div></div>'
@@ -280,7 +287,7 @@ def trackstats(t, m):
                       f'<div style="margin-top: 8px; font-size: 14px; line-height: 1.4; color: {t["muted"]}">{l}</div></div>')
         else:
             bt = f'border-top: 1px solid {t["border"]}; padding-top: 16px; '
-            cells += (f'<div style="{bt}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,38,30)}px; line-height: 1.05; color: {t["text"]}">{n}</div>'
+            cells += (f'<div style="{bt}"><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,38,30)}px; line-height: 1.05; color: {t["text"]}">{cnt(n)}</div>'
                       f'<div style="margin-top: 8px; font-size: 15px; line-height: 1.4; color: {t["muted"]}">{l}</div></div>')
     return f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,28,16)}px">{cells}</div>'
 
