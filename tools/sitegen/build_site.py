@@ -56,6 +56,8 @@ for k in list(gen.BLOB):
     gen.BLOB[k] = IMG + (ASSETS[k] if k in ASSETS else 'team/' + k[len('team_'):] + '.jpg')
 
 gen.BLOB['francis'] = IMG + 'francis-rendering.jpg'
+gen.BLOB['bonner'] = IMG + 'bonner.jpg'
+gen.BLOB['kenmore'] = IMG + 'kenmore.jpg'
 ONE_PAGER = '/static/site/docs/lv-rom-to-gmp-one-pager-draft.pdf'
 
 gen2.target = lambda key, m: PAGES[key][0]     # links go to real routes instead of canvas artboards

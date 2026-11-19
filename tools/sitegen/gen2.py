@@ -281,12 +281,14 @@ DONE = [('Berryman I', 'Mar Vista', '156', '82,700', '2025', 'berry', 'Berryman 
         ('Reading', 'Westchester', '124', '56,200', '2025', 'reading', 'Reading, a five-story blue and white building'),
         ('Wilton', 'Los Angeles', '132', '62,500', '2026', 'wilton', 'Wilton, seen from the street corner'),
         ('Venice', 'Mar Vista', '112', '54,500', '2023', 'venice', 'Venice, a four-story white and black building'),
-        ('Oxford', 'Los Angeles', '141', '66,500', '2022', 'oxford2', 'Oxford, a seven-story building seen from above')]
+        ('Oxford', 'Los Angeles', '141', '66,500', '2022', 'oxford2', 'Oxford, a seven-story building seen from above'),
+        ('Kenmore', 'East Hollywood', '29', '12,000', '2021', 'kenmore', 'Kenmore, a three-story white and dark green building seen from the street'),
+        ('Bonner', 'North Hollywood', '31', '12,000', '2020', 'bonner', 'Bonner, the street front of a white metal-clad building')]
 UC = [('2859 Francis Ave', 'Koreatown', '4% tax credit', '232', 'Mar 2029'), ('9033 Ramsgate Ave', 'Westchester', 'Market rate', '116', 'Sep 2027'),
-      ('11143 Acama St', 'Studio City', '4% tax credit', '131', '[date]'), ('5365 Crenshaw Blvd', 'South Los Angeles', 'Market rate', '48', 'Dec 2026'),
+      ('11143 Acama St', 'Studio City', '4% tax credit', '131', 'Q2 2029'), ('5365 Crenshaw Blvd', 'South Los Angeles', 'Market rate', '48', 'Dec 2026'),
       ('10953 Whipple St', 'North Hollywood', '4% tax credit', '91', 'Q4 2027'), ('5150 Riverton / 5151 Denny', 'North Hollywood', '4% tax credit', '80', 'Feb 2028'),
       ('11218 Califa St', 'North Hollywood', '4% tax credit', '76', 'Q4 2027'), ('5655 Lexington Ave', 'Hollywood', '4% tax credit', '67', 'Feb 2028'),
-      ('5614 Troost Ave', 'Valley Village', 'Market rate', '75', '[date]'),
+      ('5614 Troost Ave', 'Valley Village', 'Market rate', '75', 'Q3 2028'),
       ('1172 Nelrose Ave', 'Venice', 'Market rate', '11', 'May 2027')]
 
 def done_card(m, p, ratio='3 / 2'):
@@ -328,6 +330,11 @@ def tabs(m, items):
 
 # =================================================================== ADDED 19 NOV: partnership, what we build, awarded work, Six Peak
 SIXPEAK = 'https://www.sixpeakcapital.com/'
+TOM_EMAIL = 'tpt@sixpeakcapital.com'
+
+def mail(addr):
+    return f'<a href="mailto:{addr}" style="color: #A84A15; font-weight: 600; text-decoration: underline; text-underline-offset: 3px">{addr}</a>'
+
 
 def ext(label, url=SIXPEAK):
     return f'<a href="{url}" style="color: {t["link"]}; font-weight: 600; text-decoration: underline; text-underline-offset: 4px">{label}</a>'
@@ -363,7 +370,7 @@ def page_projects(m):
     mapsec = sec(t, m, project_map(m), pt=0, pb=px(m, 72, 40))
     done = sec(t, m, head(m, 'Completed', 'Developed by Six Peak, built by LV') + f'<div style="height: {px(m,40,26)}px"></div>'
                + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,"56px 32px","32px")}">' + ''.join(done_card(m, p) for p in DONE) + '</div>'
-               + f'<div style="margin-top: {px(m,40,28)}px; font-size: 15px; color: {MU}">[Nine more completed buildings to add, Bonner and Kenmore among them]</div>', bg=t['bg2'])
+               + f'<div style="margin-top: {px(m,40,28)}px; font-size: 15px; color: {MU}">[Seven earlier completed buildings to be listed]</div>', bg=t['bg2'])
     uc = sec(t, m, head(m, 'Under construction', 'Ten projects, 927 units') + f'<div style="height: {px(m,40,24)}px"></div>'
              + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Program', 'left'), ('Units', 'right'), ('Completion', 'right')], UC,
                      total=('Ten projects', '927 units', {0: 'Ten projects', 3: '927'})))
@@ -503,7 +510,7 @@ def page_contact(m):
     ph = (f'<div style="width: 96px; height: 96px; flex: none; background: #E2E7F0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; line-height: 1.3; color: {MU}; padding: 8px; box-sizing: border-box">[Photo: Tom Taggart]</div>')
     card = (f'<div style="display: flex; gap: 18px; align-items: center">{ph}<div><div style="font-family: {DISP}; font-weight: 600; font-size: 24px; color: {TX}">Tom Taggart</div>'
             f'<div style="font-size: 16px; color: {MU}">Head of Business Development</div></div></div>'
-            f'<div style="margin-top: 18px; font-size: 17px; line-height: 1.8; color: {TX}"><div>[direct line]</div><div>[email]</div></div>'
+            f'<div style="margin-top: 18px; font-size: 17px; line-height: 1.8; color: {TX}"><div>[direct line]</div><div>{mail(TOM_EMAIL)}</div></div>'
             f'<div style="margin-top: 18px">{btn(t, m, "Book a call", primary=False, full=m)}</div>')
     nx = [('Tom replies', 'Within [response time].'), ('If you sent a set', 'You get our number within [two weeks]: total, per square foot and per unit, what we assumed, and the places it can move.'),
           ('No strings', 'It is free, and it is not a bid.')]
@@ -619,7 +626,7 @@ def explainer_player(m):
 
 # ------------------------------------------------------------------ project map
 GEO = {'Berryman I': (34.00081, -118.41519), 'Berryman II': (34.00058, -118.41461), 'Reading': (33.95781, -118.38169), 'Wilton': (34.08223, -118.31343),
-       'Venice': (34.00319, -118.43503), 'Oxford': (34.08277, -118.30789), '2859 Francis Ave': (34.05690, -118.28801), '9033 Ramsgate Ave': (33.95471, -118.38276),
+       'Venice': (34.00319, -118.43503), 'Oxford': (34.08277, -118.30789), 'Kenmore': (34.09248, -118.29727), 'Bonner': (34.17128, -118.37381), '2859 Francis Ave': (34.05690, -118.28801), '9033 Ramsgate Ave': (33.95471, -118.38276),
        '11143 Acama St': (34.14627, -118.37346), '5365 Crenshaw Blvd': (33.99352, -118.33111), '10953 Whipple St': (34.14815, -118.36883),
        '5150 Riverton / 5151 Denny': (34.16396, -118.36490), '11218 Califa St': (34.17752, -118.37518), '5655 Lexington Ave': (34.09286, -118.31236),
        '5614 Troost Ave': (34.17250, -118.38653), '1172 Nelrose Ave': (33.99386, -118.45076), '8350 Reseda Blvd': (34.22177, -118.53598),

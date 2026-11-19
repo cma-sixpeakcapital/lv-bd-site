@@ -332,7 +332,7 @@ def tom(t, m, bg=None):
           f'justify-content: center; text-align: center; font-size: 12px; line-height: 1.3; color: {t["muted"]}; padding: 8px; box-sizing: border-box">[Photo: Tom Taggart]</div>')
     who = (f'<div><div style="font-family: {DISP}; font-weight: 600; font-size: {px(m,24,21)}px; color: {t["text"]}">Tom Taggart</div>'
            f'<div style="font-size: 16px; color: {t["muted"]}">Head of Business Development</div>'
-           f'<div style="margin-top: 8px; font-size: 16px; color: {t["text"]}">[direct line] | [email]</div></div>')
+           f'<div style="margin-top: 8px; font-size: 16px; color: {t["text"]}">[direct line] | <a href="mailto:tpt@sixpeakcapital.com" style="color: {t["text"]}; text-decoration: underline; text-underline-offset: 3px">tpt@sixpeakcapital.com</a></div></div>')
     btns = f'<div style="display: flex; flex-wrap: wrap; gap: 14px">{btn(t, m, "Book a call", full=m)}{btn(t, m, "Send a plan set", primary=False, full=m)}</div>'
     head = (f'{eyebrow(t, "Talk to us")}<div style="height: 14px"></div>{h2(t, m, "One call with Tom is the fastest way to a number.", 640)}'
             f'<div style="height: 14px"></div>{lead(t, m, "No presentation and no pitch deck. Tell him what you are building and where it stands.", 560)}')
