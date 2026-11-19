@@ -343,7 +343,7 @@ def partnership_static(m, bg=None):
             + f'<div style="height: {px(m,44,28)}px"></div>' + grid(m, 3, ''.join(ruled(m, a, b) for a, b in PARTNER), gap=40, mgap=24))
     return sec(t, m, body, bg=bg)
 
-BUILD = [('Multifamily', 'Wood-frame, podium and mid-rise apartments, from 11 to 232 units.'),
+BUILD = [('Multifamily', 'Wood-frame, podium and mid-rise apartments, from 50 to 300 units.'),
          ('Affordable and tax credit', 'Tax credit housing through LV Affordable Construction LP, built for CASp compliance and the investor reporting that tax credit deals require.'),
          ('Mixed-use', 'Ground-floor retail with apartments above, including complex podium structures.'),
          ('Commercial', 'Ground-up commercial, drawing on our podium and concrete experience.')]
