@@ -365,13 +365,12 @@ def what_we_build(m, bg=None):
             + grid(m, 4, ''.join(ruled(m, a, b) for a, b in BUILD), gap=32, mgap=24))
     return sec(t, m, body, bg=bg)
 
-# Awarded and in preconstruction. Reseda per Chris, 19 Nov. Klump and Scott are on the live site as pre-construction.
-AWARDED = [('8350 Reseda Blvd', 'Northridge', '4% tax credit', '206'), ('6010 Klump Ave', 'North Hollywood', '100% affordable (ED1)', '53'),
-           ('2227 W Scott Ave', 'Silver Lake', '100% affordable (ED1)', '38')]
+# Awarded and in preconstruction. Reseda per Chris, 19 Nov. Klump and Scott were removed on 24 Nov 2026: both projects died on 20 Nov.
+AWARDED = [('8350 Reseda Blvd', 'Northridge', '4% tax credit', '206')]
 
 def page_projects(m):
     hero = page_hero(m, 'Projects', 'Wood-frame apartment buildings in the City of Los Angeles.',
-                     'Eight buildings completed since 2020, ten under construction and three awarded. Type III and V wood frame, with and without podium or subterranean parking, from 11 to 232 units.', pb=px(m, 40, 24))
+                     'Eight buildings completed since 2020, ten under construction and one awarded. Type III and V wood frame, with and without podium or subterranean parking, from 11 to 232 units.', pb=px(m, 40, 24))
     mapsec = sec(t, m, project_map(m), pt=0, pb=px(m, 72, 40))
     done = sec(t, m, head(m, 'Completed', 'Developed by Six Peak, built by LV') + f'<div style="height: {px(m,40,26)}px"></div>'
                + f'<div style="display: grid; grid-template-columns: repeat({px(m,3,1)}, minmax(0, 1fr)); gap: {px(m,"56px 32px","32px")}">' + ''.join(done_card(m, p) for p in DONE) + '</div>'
@@ -379,9 +378,8 @@ def page_projects(m):
     uc = sec(t, m, head(m, 'Under construction', 'Ten projects, 927 units') + f'<div style="height: {px(m,40,24)}px"></div>'
              + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Program', 'left'), ('Units', 'right'), ('Completion', 'right')], UC,
                      total=('Ten projects', '927 units', {0: 'Ten projects', 3: '927'})))
-    aw = sec(t, m, head(m, 'Awarded, in preconstruction', 'Three projects, 297 units') + f'<div style="height: {px(m,40,24)}px"></div>'
-             + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Program', 'left'), ('Units', 'right')], AWARDED,
-                     total=('Three projects', '297 units', {0: 'Three projects', 3: '297'})), pt=0)
+    aw = sec(t, m, head(m, 'Awarded, in preconstruction', 'One project, 206 units') + f'<div style="height: {px(m,40,24)}px"></div>'
+             + table(m, [('Project', 'left'), ('Submarket', 'left'), ('Program', 'left'), ('Units', 'right')], AWARDED), pt=0)
     return ''.join([nav(m, 'projects'), hero, mapsec, done, uc, aw, gen.tom(t, m, bg=t['bg2']), gen.footer(t, m)])
 
 # =================================================================== PROJECT PAGES (the eight completed buildings)
@@ -729,8 +727,7 @@ GEO = {'Berryman I': (34.00081, -118.41519), 'Berryman II': (34.00058, -118.4146
        'Venice': (34.00319, -118.43503), 'Oxford': (34.08277, -118.30789), 'Kenmore': (34.09248, -118.29727), 'Bonner': (34.17128, -118.37381), '2859 Francis Ave': (34.05690, -118.28801), '9033 Ramsgate Ave': (33.95471, -118.38276),
        '11143 Acama St': (34.14627, -118.37346), '5365 Crenshaw Blvd': (33.99352, -118.33111), '10953 Whipple St': (34.14815, -118.36883),
        '5150 Riverton / 5151 Denny': (34.16396, -118.36490), '11218 Califa St': (34.17752, -118.37518), '5655 Lexington Ave': (34.09286, -118.31236),
-       '5614 Troost Ave': (34.17250, -118.38653), '1172 Nelrose Ave': (33.99386, -118.45076), '8350 Reseda Blvd': (34.22177, -118.53598),
-       '6010 Klump Ave': (34.17970, -118.37566), '2227 W Scott Ave': (34.08271, -118.26287)}
+       '5614 Troost Ave': (34.17250, -118.38653), '1172 Nelrose Ave': (33.99386, -118.45076), '8350 Reseda Blvd': (34.22177, -118.53598)}
 FILTERS = [('all', 'All'), ('done', 'Completed'), ('uc', 'Under construction'), ('aw', 'Awarded'), ('mr', 'Market rate'), ('tc', 'Tax credit')]
 
 def pins():
